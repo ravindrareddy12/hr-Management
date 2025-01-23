@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const Login = () => {
+const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -13,7 +13,7 @@ const Login = () => {
 
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
         { email, password },
         { withCredentials: true }
       );
@@ -78,7 +78,7 @@ const Login = () => {
             </a>
           </p>
           <p className="mt-2">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <a href="/register" className="text-blue-600 hover:underline">
               Register
             </a>
@@ -100,4 +100,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
