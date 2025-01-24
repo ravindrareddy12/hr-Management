@@ -60,13 +60,15 @@ exports.deleteCandidate = async (req, res) => {
 // Get recent candidates
 exports.getRecentCandidates = async (req, res) => {
     try {
-      const limit = parseInt(req.query.limit) || 5; // Get the limit from query parameters, default to 5
+        console.log("called")
+      const limit = 5// Get the limit from query parameters, default to 5
       const recentCandidates = await Candidate.find()
         .sort({ createdAt: -1 }) // Sort by creation date in descending order
         .limit(limit); // Limit the number of results
       res.json(recentCandidates);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch recent candidates" });
+        console.log(error)
+      res.status(500).json({ error: error });
     }
   };
   

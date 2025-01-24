@@ -1,5 +1,5 @@
-import React from "react";
-import CandidateStatusChart from "./CandidateStatusChart";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 // Define types for statistics and recent candidates
 interface Statistic {
@@ -16,39 +16,35 @@ interface Candidate {
 }
 
 const Dashboard: React.FC = () => {
-  // Sample data for statistics and recent candidates
+  // State for recent candidates
+  const [recentCandidates, setRecentCandidates] = useState<Candidate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch recent candidates
+  useEffect(() => {
+    const fetchRecentCandidates = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5003/api/candidates/recent/limit"
+        );
+        setRecentCandidates(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch recent candidates");
+        setLoading(false);
+      }
+    };
+
+    fetchRecentCandidates();
+  }, []);
+
+  // Sample data for statistics
   const statistics: Statistic[] = [
     { title: "Total Candidates", value: "2,456", change: "+12%" },
     { title: "Active Positions", value: "48", change: "+8%" },
     { title: "Offers Made", value: "156", change: "+24%" },
     { title: "Candidates Joined", value: "89", change: "+16%" },
-  ];
-
-  const recentCandidates: Candidate[] = [
-    {
-      name: "Sarah Wilson",
-      position: "Senior UX Designer",
-      status: "Interview",
-      date: "2024-02-15",
-    },
-    {
-      name: "Michael Chen",
-      position: "Frontend Developer",
-      status: "Screening",
-      date: "2024-02-14",
-    },
-    {
-      name: "Emily Brown",
-      position: "Product Manager",
-      status: "Offer",
-      date: "2024-02-13",
-    },
-    {
-      name: "David Kim",
-      position: "Backend Engineer",
-      status: "Hired",
-      date: "2024-02-12",
-    },
   ];
 
   return (
@@ -82,42 +78,48 @@ const Dashboard: React.FC = () => {
       {/* Recent Candidates Section */}
       <div className="bg-white p-4 rounded shadow">
         <h3 className="text-xl font-bold mb-4">Recent Candidates</h3>
-        <table className="w-full text-left border">
-          <thead>
-            <tr className="border-b">
-              <th className="p-2">Candidate</th>
-              <th className="p-2">Position</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Interview Date</th>
-              <th className="p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentCandidates.map((candidate, index) => (
-              <tr key={index} className="border-b">
-                <td className="p-2">{candidate.name}</td>
-                <td className="p-2">{candidate.position}</td>
-                <td className="p-2">
-                  <span
-                    className={`px-2 py-1 rounded text-white ${
-                      candidate.status === "Hired"
-                        ? "bg-green-500"
-                        : candidate.status === "Interview"
-                        ? "bg-yellow-500"
-                        : candidate.status === "Offer"
-                        ? "bg-blue-500"
-                        : "bg-gray-500"
-                    }`}
-                  >
-                    {candidate.status}
-                  </span>
-                </td>
-                <td className="p-2">{candidate.date}</td>
-                <td className="p-2 text-blue-500 cursor-pointer">Edit</td>
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <table className="w-full text-left border">
+            <thead>
+              <tr className="border-b">
+                <th className="p-2">Candidate</th>
+                <th className="p-2">Position</th>
+                <th className="p-2">Status</th>
+                <th className="p-2">Interview Date</th>
+                <th className="p-2">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {recentCandidates.map((candidate, index) => (
+                <tr key={index} className="border-b">
+                  <td className="p-2">{candidate.name}</td>
+                  <td className="p-2">{candidate.position}</td>
+                  <td className="p-2">
+                    <span
+                      className={`px-2 py-1 rounded text-white ${
+                        candidate.status === "Hired"
+                          ? "bg-green-500"
+                          : candidate.status === "Interview"
+                          ? "bg-yellow-500"
+                          : candidate.status === "Offer"
+                          ? "bg-blue-500"
+                          : "bg-gray-500"
+                      }`}
+                    >
+                      {candidate.status}
+                    </span>
+                  </td>
+                  <td className="p-2">{candidate.date}</td>
+                  <td className="p-2 text-blue-500 cursor-pointer">Edit</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
