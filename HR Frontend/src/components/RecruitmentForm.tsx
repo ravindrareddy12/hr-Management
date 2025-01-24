@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 interface FormData {
   tlName: string;
   taName: string;
@@ -31,7 +31,9 @@ interface FormData {
   joiningDate: string;
 }
 
+
 const RecruitmentForm: React.FC = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({
@@ -64,6 +66,34 @@ const RecruitmentForm: React.FC = () => {
     joiningDate: "",
   });
 
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`http://localhost:5003/api/candidates/${id}`)
+        .then((response) => {
+          const data = response.data;
+  
+          // Format the date fields to "YYYY-MM-DD"
+          const formattedData = {
+            ...data,
+            dateOfRequirement: data.dateOfRequirement
+              ? new Date(data.dateOfRequirement).toISOString().split("T")[0]
+              : "",
+            dateOfSubmission: data.dateOfSubmission
+              ? new Date(data.dateOfSubmission).toISOString().split("T")[0]
+              : "",
+          };
+  
+          setFormData(formattedData);
+        })
+        .catch((error) => {
+          console.error("Error fetching candidate data:", error);
+        });
+    }
+  }, [id]);
+  
+  
+
   const [error, setError] = useState<string | null>(null);
 
   // Handle form input changes
@@ -77,72 +107,39 @@ const RecruitmentForm: React.FC = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Basic validation
-    if (!formData.candidateName || !formData.position || !formData.client) {
-      setError("Please fill out all required fields.");
-      return;
-    }
-
+  
+    const url = id
+      ? `http://localhost:5003/api/candidates/${id}` // URL for updating a candidate
+      : "http://localhost:5003/api/candidates"; // URL for creating a new candidate
+  
+    const requestData = {
+      ...formData,
+      // Convert date fields to ISO format if necessary for the backend
+      dateOfRequirement: formData.dateOfRequirement
+        ? new Date(formData.dateOfRequirement).toISOString()
+        : null,
+      dateOfSubmission: formData.dateOfSubmission
+        ? new Date(formData.dateOfSubmission).toISOString()
+        : null,
+    };
+  
     try {
-      const response = await fetch("http://localhost:5000/api/candidates", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.candidateName,
-          position: formData.position,
-          client: formData.client,
-          status: formData.firstInterviewStatus || "Pending",
-          date: formData.dateOfSubmission,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add candidate.");
+      if (id) {
+        // Update existing candidate (PUT request)
+        await axios.put(url, requestData);
+      } else {
+        // Create new candidate (POST request)
+        await axios.post(url, requestData);
       }
-
-      // Reset the form
-      setFormData({
-        tlName: "",
-        taName: "",
-        am: "",
-        client: "",
-        position: "",
-        dateOfRequirement: "",
-        dateOfSubmission: "",
-        candidateName: "",
-        location: "",
-        nationality: "",
-        workStatus: "",
-        phoneNumber: "",
-        email: "",
-        noticePeriod: "",
-        workMode: "",
-        currentSalary: "",
-        expectedSalary: "",
-        firstInterviewDate: "",
-        firstInterviewStatus: "",
-        secondInterviewDate: "",
-        secondInterviewStatus: "",
-        selectionDate: "",
-        salaryOffered: "",
-        offerDate: "",
-        offerStatus: "",
-        epRequest: "",
-        joiningDate: "",
-      });
-
-      setError(null);
-      navigate("/"); // Redirect to the Candidates Management page
+  
+      // Navigate back to the candidates list
+      navigate("/candidates");
     } catch (error) {
-      console.error("Error adding candidate:", error);
-      setError(
-        "An error occurred while submitting the form. Please try again."
-      );
+      console.error("Error saving candidate data:", error);
+      alert("An error occurred while saving the candidate data. Please try again.");
     }
   };
+  
 
   return (
     <div className="p-10 bg-gray-100 min-h-screen">
