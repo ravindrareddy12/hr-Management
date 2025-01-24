@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 // Define types for statistics and recent candidates
 interface Statistic {
   title: string;
@@ -9,10 +9,12 @@ interface Statistic {
 }
 
 interface Candidate {
-  name: string;
+  candidateName: string;
   position: string;
   status: "Hired" | "Interview" | "Offer" | "Screening";
   date: string;
+  _id: string;
+  workStatus: string;
 }
 
 const Dashboard: React.FC = () => {
@@ -20,7 +22,7 @@ const Dashboard: React.FC = () => {
   const [recentCandidates, setRecentCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const navigate = useNavigate();
   // Fetch recent candidates
   useEffect(() => {
     const fetchRecentCandidates = async () => {
@@ -46,7 +48,9 @@ const Dashboard: React.FC = () => {
     { title: "Offers Made", value: "156", change: "+24%" },
     { title: "Candidates Joined", value: "89", change: "+16%" },
   ];
-
+  const handleEdit = (id: string) => {
+    navigate(`/recruitmentForm/${id}`);
+  };
   return (
     <div className="p-6 space-y-6 bg-gray-100">
       {/* Statistics Section */}
@@ -96,25 +100,24 @@ const Dashboard: React.FC = () => {
             <tbody>
               {recentCandidates.map((candidate, index) => (
                 <tr key={index} className="border-b">
-                  <td className="p-2">{candidate.name}</td>
+                  <td className="p-2">{candidate.candidateName}</td>
                   <td className="p-2">{candidate.position}</td>
                   <td className="p-2">
                     <span
-                      className={`px-2 py-1 rounded text-white ${
-                        candidate.status === "Hired"
-                          ? "bg-green-500"
-                          : candidate.status === "Interview"
-                          ? "bg-yellow-500"
-                          : candidate.status === "Offer"
-                          ? "bg-blue-500"
-                          : "bg-gray-500"
-                      }`}
+                      className={`px-2 py-1 rounded text-white `}
                     >
-                      {candidate.status}
+                      {candidate.workStatus}
                     </span>
                   </td>
                   <td className="p-2">{candidate.date}</td>
-                  <td className="p-2 text-blue-500 cursor-pointer">Edit</td>
+                  <td className="p-2 text-blue-500 cursor-pointer">
+                  <button
+                    onClick={() => handleEdit(candidate._id)}
+                    className="text-blue-500 hover:underline"
+                  >
+                    Edit
+                  </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
