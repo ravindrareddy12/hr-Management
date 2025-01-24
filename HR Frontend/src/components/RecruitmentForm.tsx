@@ -19,18 +19,18 @@ interface FormData {
   workMode: string;
   currentSalary: string;
   expectedSalary: string;
-  firstInterviewDate: string;
-  firstInterviewStatus: string;
-  secondInterviewDate: string;
-  secondInterviewStatus: string;
+  internalInterviewDate: string;
+  internalInterviewStatus: string;
+  clientInterviewDate: string;
+  clientInterviewStatus: string;
   selectionDate: string;
   salaryOffered: string;
   offerDate: string;
   offerStatus: string;
   epRequest: string;
   joiningDate: string;
+  remarks: string;
 }
-
 
 const RecruitmentForm: React.FC = () => {
   const { id } = useParams();
@@ -54,16 +54,17 @@ const RecruitmentForm: React.FC = () => {
     workMode: "",
     currentSalary: "",
     expectedSalary: "",
-    firstInterviewDate: "",
-    firstInterviewStatus: "",
-    secondInterviewDate: "",
-    secondInterviewStatus: "",
+    internalInterviewDate: "",
+    internalInterviewStatus: "",
+    clientInterviewDate: "",
+    clientInterviewStatus: "",
     selectionDate: "",
     salaryOffered: "",
     offerDate: "",
     offerStatus: "",
     epRequest: "",
     joiningDate: "",
+    remarks: "",
   });
 
   useEffect(() => {
@@ -72,7 +73,7 @@ const RecruitmentForm: React.FC = () => {
         .get(`http://localhost:5003/api/candidates/${id}`)
         .then((response) => {
           const data = response.data;
-  
+
           // Format the date fields to "YYYY-MM-DD"
           const formattedData = {
             ...data,
@@ -83,7 +84,7 @@ const RecruitmentForm: React.FC = () => {
               ? new Date(data.dateOfSubmission).toISOString().split("T")[0]
               : "",
           };
-  
+
           setFormData(formattedData);
         })
         .catch((error) => {
@@ -91,8 +92,6 @@ const RecruitmentForm: React.FC = () => {
         });
     }
   }, [id]);
-  
-  
 
   const [error, setError] = useState<string | null>(null);
 
@@ -107,11 +106,11 @@ const RecruitmentForm: React.FC = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     const url = id
       ? `http://localhost:5003/api/candidates/${id}` // URL for updating a candidate
       : "http://localhost:5003/api/candidates"; // URL for creating a new candidate
-  
+
     const requestData = {
       ...formData,
       // Convert date fields to ISO format if necessary for the backend
@@ -122,7 +121,7 @@ const RecruitmentForm: React.FC = () => {
         ? new Date(formData.dateOfSubmission).toISOString()
         : null,
     };
-  
+
     try {
       if (id) {
         // Update existing candidate (PUT request)
@@ -131,15 +130,16 @@ const RecruitmentForm: React.FC = () => {
         // Create new candidate (POST request)
         await axios.post(url, requestData);
       }
-  
+
       // Navigate back to the candidates list
       navigate("/candidates");
     } catch (error) {
       console.error("Error saving candidate data:", error);
-      alert("An error occurred while saving the candidate data. Please try again.");
+      alert(
+        "An error occurred while saving the candidate data. Please try again."
+      );
     }
   };
-  
 
   return (
     <div className="p-10 bg-gray-100 min-h-screen">
@@ -239,8 +239,7 @@ const RecruitmentForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Date Fields */}
-        <div className="grid grid-cols-2 gap-4 pt-5">
+        <div className="grid grid-cols-3 gap-4 pt-5">
           <div>
             <label
               className="block text-sm font-medium text-gray-700"
@@ -325,7 +324,6 @@ const RecruitmentForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Additional Fields and Labels */}
         <div className="grid grid-cols-3 gap-4 pt-5">
           <div>
             <label
@@ -377,7 +375,6 @@ const RecruitmentForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Remaining Fields and Labels */}
         <div className="grid grid-cols-3 gap-4 pt-5">
           <div>
             <label
@@ -442,6 +439,188 @@ const RecruitmentForm: React.FC = () => {
               placeholder="Expected Salary"
               className="input border p-2 rounded w-full"
             />
+          </div>
+        </div>
+        <h1 className="font-bold mt-7">Internal Assessment Details</h1>
+        <div className="grid grid-cols-3 gap-4 pt-5">
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="am"
+            >
+              I/W Date
+            </label>
+            <input
+              type="date"
+              name="am"
+              value={formData.internalInterviewDate}
+              onChange={handleChange}
+              className="input border p-2 rounded w-full"
+            />
+          </div>
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="client"
+            >
+              Status
+            </label>
+            <input
+              type="text"
+              name="client"
+              value={formData.internalInterviewStatus}
+              onChange={handleChange}
+              placeholder="Internal Interview Status"
+              className="input border p-2 rounded w-full"
+            />
+          </div>
+        </div>
+
+        <h1 className="font-bold mt-7">Client Interview</h1>
+        <div className="grid grid-cols-3 gap-4 pt-5">
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="am"
+            >
+              I/W Date
+            </label>
+            <input
+              type="date"
+              name="am"
+              value={formData.clientInterviewDate}
+              onChange={handleChange}
+              className="input border p-2 rounded w-full"
+            />
+          </div>
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="client"
+            >
+              Status
+            </label>
+            <input
+              type="text"
+              name="client"
+              value={formData.clientInterviewStatus}
+              onChange={handleChange}
+              placeholder="Client Interview Status"
+              className="input border p-2 rounded w-full"
+            />
+          </div>
+        </div>
+
+        <h1 className="font-bold mt-7">Offer Details</h1>
+        <div className="grid grid-cols-3 gap-4 pt-5">
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="am"
+            >
+              Selection Date
+            </label>
+            <input
+              type="date"
+              name="am"
+              value={formData.selectionDate}
+              onChange={handleChange}
+              className="input border p-2 rounded w-full"
+            />
+          </div>
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="client"
+            >
+              Salary Offered
+            </label>
+            <input
+              type="text"
+              name="client"
+              value={formData.salaryOffered}
+              onChange={handleChange}
+              placeholder="Salary Offered"
+              className="input border p-2 rounded w-full"
+            />
+          </div>
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="client"
+            >
+              Offer Date
+            </label>
+            <input
+              type="date"
+              name="client"
+              value={formData.offerDate}
+              onChange={handleChange}
+              className="input border p-2 rounded w-full"
+            />
+          </div>
+
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="client"
+            >
+              Offer Status
+            </label>
+            <input
+              type="text"
+              name="client"
+              value={formData.offerStatus}
+              onChange={handleChange}
+              placeholder="Offer Status"
+              className="input border p-2 rounded w-full"
+            />
+          </div>
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="client"
+            >
+              EP Request
+            </label>
+            <input
+              type="text"
+              name="client"
+              value={formData.epRequest}
+              onChange={handleChange}
+              placeholder="EP Request"
+              className="input border p-2 rounded w-full"
+            />
+          </div>
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="client"
+            >
+              Joining Date
+            </label>
+            <input
+              type="date"
+              name="client"
+              value={formData.joiningDate}
+              onChange={handleChange}
+              className="input border p-2 rounded w-full"
+            />
+          </div>
+          <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="remarks"
+            >
+              Remarks
+            </label>
+            <textarea
+              name="remarks"
+              value={formData.remarks}
+              onChange={handleChange}
+              placeholder="Enter your remarks here..."
+              className="textarea border p-2 rounded w-full h-32 resize-none"
+            ></textarea>
           </div>
         </div>
 
