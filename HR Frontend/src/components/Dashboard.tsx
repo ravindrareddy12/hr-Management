@@ -53,25 +53,25 @@ const Dashboard: React.FC = () => {
     {
       title: "Total Candidates",
       value: "99999",
-      change: "+12%",
+      change: "",
       icon: <FaUsers size={30} className="text-blue-500" />, // Blue icon
     },
     {
       title: "Active Positions",
       value: "99999",
-      change: "+8%",
+      change: "",
       icon: <FaBriefcase size={30} className="text-yellow-500" />, // Yellow icon
     },
     {
       title: "Offers Made",
       value: "99999",
-      change: "+24%",
+      change: "",
       icon: <FaHandshake size={30} className="text-green-500" />, // Green icon
     },
     {
       title: "Candidates Joined",
       value: "99999",
-      change: "+16%",
+      change: "",
       icon: <FaRegCheckCircle size={30} className="text-teal-500" />, // Teal icon
     },
   ];
@@ -83,15 +83,15 @@ const Dashboard: React.FC = () => {
   const getStatusColor = (status: string | null) => {
     switch (status) {
       case "Accepted":
-        return "bg-green-500 text-white"; // Green background for Accepted
+        return "bg-gradient-to-r from-green-400 to-green-600 text-white";
       case "Released":
-        return "bg-yellow-500 text-white"; // Yellow background for Released
+        return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white";
       case "Declined":
-        return "bg-red-500 text-white"; // Red background for Declined
+        return "bg-gradient-to-r from-red-400 to-red-600 text-white";
       case "Pending":
-        return "bg-blue-500 text-white"; // Blue background for Pending
+        return "bg-gradient-to-r from-blue-400 to-blue-600 text-white";
       default:
-        return "bg-gray-300 text-gray-700"; // Default background for no status
+        return "bg-gradient-to-r from-gray-300 to-gray-500 text-gray-700";
     }
   };
 
