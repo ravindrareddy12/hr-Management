@@ -9,24 +9,6 @@ interface FormData {
 const RecruitmentForm: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [dropdowns, setDropdowns] = useState<{
-    [key: string]: string[];
-  }>({
-    tlName: [],
-    taName: [],
-    am: [],
-    client: [],
-    location: [],
-    nationality: [],
-    workStatus: [],
-    noticePeriod: [],
-    workMode: [],
-    internalInterviewStatus: [],
-    clientInterviewStatus: [],
-    offerStatus: [],
-    epRequest: [],
-  });
-
   const [formData, setFormData] = useState<FormData>({
     tlName: "",
     taName: "",
@@ -59,28 +41,6 @@ const RecruitmentForm: React.FC = () => {
   });
 
   const [error, setError] = useState<string | null>(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  const handleDropdownClick = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-    if (!isDropdownOpen) {
-      // Navigate to the dropdown form route
-      navigate("/dropdownsManager"); // Replace "/dropdowns" with the appropriate route for your dropdown form
-    }
-  };
-
-  // Fetch dropdown options
-  useEffect(() => {
-    axios
-      .get("http://localhost:5003/api/dropdowns")
-      .then((response) => {
-        setDropdowns(response.data);
-      })
-      .catch((err) => {
-        console.error("Error fetching dropdowns:", err);
-        setError("Failed to load dropdown options.");
-      });
-  }, []);
 
   // Fetch candidate data
   useEffect(() => {
@@ -160,16 +120,6 @@ const RecruitmentForm: React.FC = () => {
         className="bg-white p-6 rounded-lg shadow-lg"
         onSubmit={handleSubmit}
       >
-        <div className="mb-4">
-          <button
-            type="button"
-            className="bg-blue-500 text-white py-2 px-4 rounded"
-            onClick={handleDropdownClick}
-          >
-            {isDropdownOpen ? "Close Dropdowns Form" : "Manage Dropdowns"}
-          </button>
-        </div>
-
         {/* Form Fields */}
         <div className="grid grid-cols-3 gap-4">
           <div>
@@ -179,20 +129,14 @@ const RecruitmentForm: React.FC = () => {
             >
               <span className="text-red-600">* </span> TL Name
             </label>
-
-            <select
+            <input
+              type="text"
               name="tlName"
               value={formData.tlName || ""}
               onChange={handleChange}
+              placeholder="TL Name"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select TL Name</option>
-              {dropdowns.tlName.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
           <div>
@@ -200,22 +144,16 @@ const RecruitmentForm: React.FC = () => {
               className="block text-sm font-medium text-gray-700"
               htmlFor="taName"
             >
-              <span className="text-red-600">* </span>
-              TA Name
+              <span className="text-red-600">* </span> TA Name
             </label>
-            <select
+            <input
+              type="text"
               name="taName"
               value={formData.taName || ""}
               onChange={handleChange}
+              placeholder="TA Name"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select TA Name</option>
-              {dropdowns.taName.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
         </div>
 
@@ -228,19 +166,14 @@ const RecruitmentForm: React.FC = () => {
             >
               AM
             </label>
-            <select
+            <input
+              type="text"
               name="am"
               value={formData.am || ""}
               onChange={handleChange}
+              placeholder="AM"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select AM</option>
-              {dropdowns.am.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div>
             <label
@@ -249,19 +182,14 @@ const RecruitmentForm: React.FC = () => {
             >
               Client
             </label>
-            <select
+            <input
+              type="text"
               name="client"
               value={formData.client || ""}
               onChange={handleChange}
+              placeholder="Client"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select Client</option>
-              {dropdowns.client.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div>
             <label
@@ -339,19 +267,14 @@ const RecruitmentForm: React.FC = () => {
             >
               Location
             </label>
-            <select
+            <input
+              type="text"
               name="location"
               value={formData.location || ""}
               onChange={handleChange}
+              placeholder="Location"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select Location</option>
-              {dropdowns.location.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div>
             <label
@@ -360,19 +283,14 @@ const RecruitmentForm: React.FC = () => {
             >
               Nationality
             </label>
-            <select
+            <input
+              type="text"
               name="nationality"
               value={formData.nationality || ""}
               onChange={handleChange}
+              placeholder="Nationality"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select Nationality</option>
-              {dropdowns.nationality.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
         </div>
 
@@ -384,19 +302,14 @@ const RecruitmentForm: React.FC = () => {
             >
               Work Status
             </label>
-            <select
+            <input
+              type="text"
               name="workStatus"
               value={formData.workStatus || ""}
               onChange={handleChange}
+              placeholder="Work Status"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select Work Status</option>
-              {dropdowns.workStatus.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div>
             <label
@@ -440,19 +353,14 @@ const RecruitmentForm: React.FC = () => {
             >
               Notice Period
             </label>
-            <select
+            <input
+              type="text"
               name="noticePeriod"
               value={formData.noticePeriod || ""}
               onChange={handleChange}
+              placeholder="Notice Period"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select Notice Period</option>
-              {dropdowns.noticePeriod.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
           <div>
@@ -462,19 +370,14 @@ const RecruitmentForm: React.FC = () => {
             >
               Work Mode
             </label>
-            <select
+            <input
+              type="text"
               name="workMode"
               value={formData.workMode || ""}
               onChange={handleChange}
+              placeholder="Work Mode"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select Work Mode</option>
-              {dropdowns.workMode.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div>
             <label
@@ -495,7 +398,7 @@ const RecruitmentForm: React.FC = () => {
           <div>
             <label
               className="block text-sm font-medium text-gray-700"
-              htmlFor="currentSalary"
+              htmlFor="expectedSalary"
             >
               Expected Salary
             </label>
@@ -533,19 +436,14 @@ const RecruitmentForm: React.FC = () => {
             >
               Status
             </label>
-            <select
+            <input
+              type="text"
               name="internalInterviewStatus"
               value={formData.internalInterviewStatus || ""}
               onChange={handleChange}
+              placeholder="Internal Interview Status"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select Internal Interview Status</option>
-              {dropdowns.internalInterviewStatus.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
         </div>
 
@@ -573,19 +471,14 @@ const RecruitmentForm: React.FC = () => {
             >
               Status
             </label>
-            <select
+            <input
+              type="text"
               name="clientInterviewStatus"
               value={formData.clientInterviewStatus || ""}
               onChange={handleChange}
+              placeholder="Client Interview Status"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select Client Interview Status</option>
-              {dropdowns.clientInterviewStatus.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
         </div>
 
@@ -646,17 +539,16 @@ const RecruitmentForm: React.FC = () => {
               Offer Status
             </label>
             <select
-              name="workMode"
+              name="offerStatus"
               value={formData.offerStatus || ""}
               onChange={handleChange}
               className="input border p-2 rounded w-full"
             >
-              <option value="">Select Offer Status</option>
-              {dropdowns.offerStatus.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
+              <option value="">Filter By Offer Status</option>
+              <option value="Released">RELEASED</option>
+              <option value="Accepted">ACCEPTED</option>
+              <option value="Pending">PENDING</option>
+              <option value="Declined">DECLINED</option>
             </select>
           </div>
 
@@ -667,19 +559,14 @@ const RecruitmentForm: React.FC = () => {
             >
               EP Request
             </label>
-            <select
+            <input
+              type="text"
               name="epRequest"
               value={formData.epRequest || ""}
               onChange={handleChange}
+              placeholder="EP Request"
               className="input border p-2 rounded w-full"
-            >
-              <option value="">Select EP Request</option>
-              {dropdowns.epRequest.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div>
             <label

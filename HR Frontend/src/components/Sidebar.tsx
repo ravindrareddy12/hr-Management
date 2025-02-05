@@ -5,7 +5,7 @@ const Sidebar: React.FC = () => {
   return (
     <div className="w-40 h-screen bg-white p-4 flex flex-col">
       <ul className="space-y-6 flex-grow">
-        <li>
+        {/* <li>
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
@@ -17,7 +17,7 @@ const Sidebar: React.FC = () => {
             <FaChartLine className="w-5 h-5" />
             <span>Dashboard</span>
           </NavLink>
-        </li>
+        </li> */}
         <li>
           <NavLink
             to="/candidates"

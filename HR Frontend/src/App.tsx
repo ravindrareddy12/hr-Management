@@ -20,7 +20,7 @@ const App: React.FC = () => {
         <Sidebar />
         <div className="flex-1 p-4">
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route path="/" element={<Navigate to="/candidates" />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/candidates" element={<Candidates />} />
             <Route path="/recruitmentForm/:id?" element={<RecruitmentForm />} />

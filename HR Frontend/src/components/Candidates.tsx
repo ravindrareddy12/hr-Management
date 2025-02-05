@@ -128,15 +128,15 @@ const Candidates: React.FC = () => {
             onChange={(e) => setFilterStatus(e.target.value)}
             className="border border-gray-300 p-2 rounded w-59"
           >
-            <option value="">Filter By Work Status</option>
-            <option value="Released">Released</option>
-            <option value="Accepted">Accepted</option>
-            <option value="Pending">Pending</option>
-            <option value="Declined">Declined</option>
+            <option value="">Filter By Offer Status</option>
+            <option value="Released">RELEASED</option>
+            <option value="Accepted">ACCEPTED</option>
+            <option value="Pending">PENDING</option>
+            <option value="Declined">DECLINED</option>{" "}
           </select>
 
           {/* Date Range Picker */}
-          <div
+          {/* <div
             id="date-range-picker"
             date-rangepicker
             className="flex items-center w-80"
@@ -148,7 +148,7 @@ const Candidates: React.FC = () => {
               onChange={(e) => setDateRange(e.target.value)}
               className="border border-gray-300 p-2 rounded w-full"
             />
-          </div>
+          </div> */}
           <button
             onClick={resetFilters}
             className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-40"
