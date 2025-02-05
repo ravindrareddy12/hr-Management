@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import * as XLSX from "xlsx"; // Import XLSX library for Excel export
+import * as XLSX from "../../public/Master_Tracker.xlsx";
 
 interface Candidate {
   _id: string;
@@ -19,7 +19,7 @@ const Candidates: React.FC = () => {
   const [candidatesPerPage] = useState(8);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const [dateRange, setDateRange] = useState<string>(""); // Store the date range in a single string
+  const [dateRange, setDateRange] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -84,23 +84,44 @@ const Candidates: React.FC = () => {
   };
 
   const exportToExcel = () => {
+    if (filteredCandidates.length === 0) {
+      alert("No data available to export.");
+      return;
+    }
+
+    // Define the headers
+    const headers = [
+      "Candidate Name",
+      "Position",
+      "Client",
+      "Work Status",
+      "Offer Status",
+      "Date of Submission",
+    ];
+
+    // Prepare the data to match the headers
     const exportData = filteredCandidates.map((candidate) => ({
-      "Candidate Name": candidate.candidateName,
-      Position: candidate.position,
-      Client: candidate.client,
-      "Work Status": candidate.workStatus,
-      "Offer Status": candidate.offerStatus,
-      "Date of Submission": candidate.dateOfSubmission,
+      "Candidate Name": candidate.candidateName || "",
+      Position: candidate.position || "",
+      Client: candidate.client || "",
+      "Work Status": candidate.workStatus || "",
+      "Offer Status": candidate.offerStatus || "",
+      "Date of Submission": candidate.dateOfSubmission
+        ? new Date(candidate.dateOfSubmission).toLocaleDateString("en-GB")
+        : "",
     }));
 
-    // Exporting logic (currently commented out)
-    // const ws = XLSX.utils.json_to_sheet(exportData);
-    // const wb = XLSX.utils.book_new();
-    // XLSX.utils.book_append_sheet(wb, ws, "Candidates");
-    // XLSX.writeFile(wb, "Candidates_Report.xlsx");
+    // Create a worksheet with the headers and data
+    const ws = XLSX.utils.json_to_sheet(exportData, { header: headers });
+
+    // Create a new workbook and append the worksheet
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Filtered Candidates");
+
+    // Write the workbook to a file and trigger a download
+    XLSX.writeFile(wb, "Filtered_Candidates_Report.xlsx");
   };
 
-  // Pagination logic
   const indexOfLastCandidate = currentPage * candidatesPerPage;
   const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
   const currentCandidates = filteredCandidates.slice(
@@ -115,7 +136,6 @@ const Candidates: React.FC = () => {
       <div className="flex flex-col space-y-4 mb-5">
         <h1 className="text-xl font-bold">Candidates Management</h1>
         <div className="flex flex-wrap gap-4 mb-4">
-          {/* Filter Inputs */}
           <input
             type="text"
             placeholder="Search by name"
@@ -132,23 +152,9 @@ const Candidates: React.FC = () => {
             <option value="Released">RELEASED</option>
             <option value="Accepted">ACCEPTED</option>
             <option value="Pending">PENDING</option>
-            <option value="Declined">DECLINED</option>{" "}
+            <option value="Declined">DECLINED</option>
           </select>
 
-          {/* Date Range Picker */}
-          {/* <div
-            id="date-range-picker"
-            date-rangepicker
-            className="flex items-center w-80"
-          >
-            <input
-              type="text"
-              placeholder="YYYY-MM-DD - YYYY-MM-DD"
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value)}
-              className="border border-gray-300 p-2 rounded w-full"
-            />
-          </div> */}
           <button
             onClick={resetFilters}
             className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-40"
@@ -170,7 +176,6 @@ const Candidates: React.FC = () => {
         </div>
       </div>
 
-      {/* Cards or Table Display Section */}
       <div className="bg-white p-4 rounded-lg shadow-lg">
         <table className="w-full border-collapse border border-gray-300 text-left">
           <thead className="bg-gray-200">
@@ -199,13 +204,10 @@ const Candidates: React.FC = () => {
                   {candidate.offerStatus}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {candidate.dateOfSubmission
-                    ? new Date(candidate.dateOfSubmission).toLocaleDateString(
-                        "en-GB"
-                      )
-                    : new Date().toLocaleDateString("en-GB")}
+                  {new Date(candidate.dateOfSubmission).toLocaleDateString(
+                    "en-GB"
+                  )}
                 </td>
-
                 <td className="border border-gray-300 p-2">
                   <button
                     onClick={() => handleEdit(candidate._id)}
@@ -225,7 +227,6 @@ const Candidates: React.FC = () => {
           </tbody>
         </table>
 
-        {/* Pagination */}
         <div className="flex justify-center mt-4">
           <ul className="flex space-x-2">
             {Array.from(

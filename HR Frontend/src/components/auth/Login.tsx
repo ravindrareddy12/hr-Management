@@ -1,28 +1,29 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/login`,
         { email, password },
-        { withCredentials: true } // To include cookies
+        { withCredentials: true }
       );
 
       if (res.status === 200) {
-        navigate('/home'); // Redirect to home on success
+        localStorage.setItem("userName", res.data.user.username); // Store username
+        navigate("/candidates"); // Redirect after login
       }
-    } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred');
+    } catch (err: any) {
+      setError(err.response?.data?.message || "An error occurred");
     }
   };
 
@@ -33,11 +34,10 @@ const Login = () => {
         {error && <p className="mt-4 text-red-600">{error}</p>}
         <form onSubmit={handleLogin} className="mt-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-600">
+            <label className="block text-sm font-medium text-gray-600">
               Email
             </label>
             <input
-              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -46,11 +46,10 @@ const Login = () => {
             />
           </div>
           <div className="mt-4">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-600">
+            <label className="block text-sm font-medium text-gray-600">
               Password
             </label>
             <input
-              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -58,18 +57,18 @@ const Login = () => {
               required
             />
           </div>
-          <button
-            type="submit"
-            className="w-full px-4 py-2 mt-6 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
-          >
+          <button className="w-full px-4 py-2 mt-6 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
             Login
           </button>
         </form>
         <p className="mt-4 text-sm text-center text-gray-600">
-          Don't have an account?{' '}
-          <a href="/register" className="text-blue-600 hover:underline">
-            Register
-          </a>
+          Don't have an account?{" "}
+          <button
+            onClick={() => navigate("/register")}
+            className="text-blue-600 hover:underline"
+          >
+            Register here
+          </button>
         </p>
       </div>
     </div>

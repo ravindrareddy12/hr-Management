@@ -6,7 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 interface NavbarProps {
-  userName: string; // Prop for user's name
+  userName: string;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ userName }) => {
@@ -14,7 +14,6 @@ const Navbar: React.FC<NavbarProps> = ({ userName }) => {
   const [currentDate, setCurrentDate] = useState<string>("");
 
   useEffect(() => {
-    // Update the current date when the component mounts
     const today = new Date();
     const formattedDate = today.toLocaleDateString("en-US", {
       weekday: "long",
@@ -25,19 +24,35 @@ const Navbar: React.FC<NavbarProps> = ({ userName }) => {
     setCurrentDate(formattedDate);
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await axios.post(
+  const handleLogout = () => {
+    console.log("Logging out...");
+
+    axios
+      .post(
         `${import.meta.env.VITE_API_URL}/api/auth/logout`,
         {},
         { withCredentials: true }
-      );
-      navigate("/login");
-      toast.success("Successfully logged out!");
-    } catch (err) {
-      console.error("Logout failed", err);
-      toast.error("An error occurred during logout. Please try again.");
-    }
+      )
+      .then(() => {
+        // Clear user data from local storage and session storage
+        localStorage.removeItem("authToken");
+        sessionStorage.clear();
+
+        // Show success toast
+        toast.success("Successfully logged out!");
+
+        // Immediately navigate to the login page
+        navigate("/login"); // Ensure this is called after the logout process completes
+      })
+      .catch((err) => {
+        // Handle error
+        const errorMessage =
+          err.response?.data?.message ||
+          err.message ||
+          "An unknown error occurred.";
+        console.error("Logout failed:", errorMessage);
+        toast.error(`Logout failed: ${errorMessage}`);
+      });
   };
 
   return (
