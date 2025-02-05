@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import * as XLSX from "../../public/Master_Tracker.xlsx";
+import * as XLSX from "xlsx"; // Correct import
+
 
 interface Candidate {
   _id: string;
@@ -82,46 +83,121 @@ const Candidates: React.FC = () => {
     setFilterStatus("");
     setDateRange("");
   };
-
   const exportToExcel = () => {
     if (filteredCandidates.length === 0) {
       alert("No data available to export.");
       return;
     }
-
-    // Define the headers
+  
+    // Define all headers based on the API response
     const headers = [
-      "Candidate Name",
-      "Position",
+      "TL Name",
+      "TA Name",
+      "AM",
       "Client",
-      "Work Status",
-      "Offer Status",
+      "Position",
+      "Date of Requirement",
       "Date of Submission",
+      "Candidate Name",
+      "Location",
+      "Nationality",
+      "Work Status",
+      "Phone Number",
+      "Email",
+      "Notice Period",
+      "Work Mode",
+      "Current Salary",
+      "Expected Salary",
+      "Internal Interview Date",
+      "Internal Interview Status",
+      "Client Interview Date",
+      "Client Interview Status",
+      "Selection Date",
+      "Salary Offered",
+      "Offer Date",
+      "Offer Status",
+      "EP Request",
+      "Joining Date",
+      "Remarks",
+      "Created At",
+      "Updated At",
     ];
-
+  
     // Prepare the data to match the headers
-    const exportData = filteredCandidates.map((candidate) => ({
-      "Candidate Name": candidate.candidateName || "",
-      Position: candidate.position || "",
-      Client: candidate.client || "",
-      "Work Status": candidate.workStatus || "",
-      "Offer Status": candidate.offerStatus || "",
-      "Date of Submission": candidate.dateOfSubmission
+    const exportData = filteredCandidates.map((candidate) => [
+      candidate.tlName || "",
+      candidate.taName || "",
+      candidate.am || "",
+      candidate.client || "",
+      candidate.position || "",
+      candidate.dateOfRequirement
+        ? new Date(candidate.dateOfRequirement).toLocaleDateString("en-GB")
+        : "",
+      candidate.dateOfSubmission
         ? new Date(candidate.dateOfSubmission).toLocaleDateString("en-GB")
         : "",
-    }));
-
-    // Create a worksheet with the headers and data
-    const ws = XLSX.utils.json_to_sheet(exportData, { header: headers });
-
-    // Create a new workbook and append the worksheet
+      candidate.candidateName || "",
+      candidate.location || "",
+      candidate.nationality || "",
+      candidate.workStatus || "",
+      candidate.phoneNumber || "",
+      candidate.email || "",
+      candidate.noticePeriod || "",
+      candidate.workMode || "",
+      candidate.currentSalary || "",
+      candidate.expectedSalary || "",
+      candidate.internalInterviewDate
+        ? new Date(candidate.internalInterviewDate).toLocaleDateString("en-GB")
+        : "",
+      candidate.internalInterviewStatus || "",
+      candidate.clientInterviewDate
+        ? new Date(candidate.clientInterviewDate).toLocaleDateString("en-GB")
+        : "",
+      candidate.clientInterviewStatus || "",
+      candidate.selectionDate
+        ? new Date(candidate.selectionDate).toLocaleDateString("en-GB")
+        : "",
+      candidate.salaryOffered || "",
+      candidate.offerDate
+        ? new Date(candidate.offerDate).toLocaleDateString("en-GB")
+        : "",
+      candidate.offerStatus || "",
+      candidate.epRequest || "",
+      candidate.joiningDate
+        ? new Date(candidate.joiningDate).toLocaleDateString("en-GB")
+        : "",
+      candidate.remarks || "",
+      candidate.createdAt
+        ? new Date(candidate.createdAt).toLocaleDateString("en-GB")
+        : "",
+      candidate.updatedAt
+        ? new Date(candidate.updatedAt).toLocaleDateString("en-GB")
+        : "",
+    ]);
+  
+    // Add headers as the first row
+    const finalData = [headers, ...exportData];
+  
+    // Create worksheet and workbook
+    const ws = XLSX.utils.aoa_to_sheet(finalData);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Filtered Candidates");
-
-    // Write the workbook to a file and trigger a download
-    XLSX.writeFile(wb, "Filtered_Candidates_Report.xlsx");
+    XLSX.utils.book_append_sheet(wb, ws, "All Candidates Data");
+  
+    // Auto-fit columns for better readability
+    const maxColWidths = headers.map((header, i) =>
+      Math.max(
+        header.length,
+        ...exportData.map((row) => (row[i] ? row[i].toString().length : 0))
+      )
+    );
+  
+    ws["!cols"] = maxColWidths.map((width) => ({ wch: width + 5 }));
+  
+    // Trigger download
+    XLSX.writeFile(wb, "All_Candidates_Report.xlsx");
   };
-
+  
+  
   const indexOfLastCandidate = currentPage * candidatesPerPage;
   const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
   const currentCandidates = filteredCandidates.slice(
