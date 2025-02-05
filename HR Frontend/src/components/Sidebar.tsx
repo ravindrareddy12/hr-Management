@@ -31,6 +31,21 @@ const Sidebar: React.FC = () => {
             <span>Candidates</span>
           </NavLink>
         </li>
+        <li>
+          <NavLink
+            to="/users" // Corrected the typo from "creaate" to "create"
+            className={
+              ({ isActive }) =>
+                isActive
+                  ? "flex items-center space-x-3 text-blue-400 font-medium"
+                  : "flex items-center space-x-3 text-gray-300 hover:text-blue-400" // text-black-300 corrected to text-gray-300 for consistency
+            }
+          >
+            <FaUserFriends className="w-5 h-5" />
+            <span>Users</span>
+          </NavLink>
+        </li>
+
         {/* Add more menu items as needed */}
       </ul>
     </div>

@@ -27,6 +27,10 @@ const Login = () => {
     }
   };
 
+  const handleContactClick = () => {
+    navigate("/register"); // Redirect to registration page when clicked
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
@@ -64,10 +68,10 @@ const Login = () => {
         <p className="mt-4 text-sm text-center text-gray-600">
           Don't have an account?{" "}
           <button
-            onClick={() => navigate("/register")}
+            // onClick={handleContactClick} // Trigger registration page navigation
             className="text-blue-600 hover:underline"
           >
-            Register here
+            Contact Administrator or Team Leader for Registration
           </button>
         </p>
       </div>

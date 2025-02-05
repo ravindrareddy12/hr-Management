@@ -15,6 +15,7 @@ const candidateSchema = new mongoose.Schema(
     workStatus: String,
     phoneNumber: String,
     email: String,
+    totalYearsOfExperience :String,
     noticePeriod: String,
     workMode: String,
     currentSalary: String,

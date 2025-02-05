@@ -24,6 +24,7 @@ const RecruitmentForm: React.FC = () => {
     phoneNumber: "",
     email: "",
     noticePeriod: "",
+    totalYearsOfExperience:"",
     workMode: "",
     currentSalary: "",
     expectedSalary: "",
@@ -343,9 +344,26 @@ const RecruitmentForm: React.FC = () => {
               className="input border p-2 rounded w-full"
             />
           </div>
+          
         </div>
 
         <div className="grid grid-cols-3 gap-4 pt-5">
+        <div>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="totalYearsOfExperience"
+            >
+              Total Years Of Experience
+            </label>
+            <input
+              type="text"
+              name="totalYearsOfExperience"
+              value={formData.totalYearsOfExperience || ""}
+              onChange={handleChange}
+              placeholder="Total Years Of Experience"
+              className="input border p-2 rounded w-full"
+            />
+          </div>
           <div>
             <label
               className="block text-sm font-medium text-gray-700"

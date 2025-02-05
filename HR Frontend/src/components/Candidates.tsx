@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx"; // Correct import
 
-
 interface Candidate {
   _id: string;
   candidateName: string;
@@ -52,9 +51,15 @@ const Candidates: React.FC = () => {
   const applyFilters = () => {
     let filtered = candidates;
 
+    // Filter by name, email, or phone number
     if (searchTerm) {
-      filtered = filtered.filter((candidate) =>
-        candidate.candidateName.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (candidate) =>
+          candidate.candidateName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          candidate.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          candidate.phoneNumber.includes(searchTerm)
       );
     }
 
@@ -88,7 +93,7 @@ const Candidates: React.FC = () => {
       alert("No data available to export.");
       return;
     }
-  
+
     // Define all headers based on the API response
     const headers = [
       "TL Name",
@@ -104,6 +109,7 @@ const Candidates: React.FC = () => {
       "Work Status",
       "Phone Number",
       "Email",
+      "Total Years of Experience",
       "Notice Period",
       "Work Mode",
       "Current Salary",
@@ -122,8 +128,8 @@ const Candidates: React.FC = () => {
       "Created At",
       "Updated At",
     ];
-  
-    // Prepare the data to match the headers
+
+    // Prepare the data
     const exportData = filteredCandidates.map((candidate) => [
       candidate.tlName || "",
       candidate.taName || "",
@@ -142,6 +148,7 @@ const Candidates: React.FC = () => {
       candidate.workStatus || "",
       candidate.phoneNumber || "",
       candidate.email || "",
+      candidate.totalYearsOfExperience || "",
       candidate.noticePeriod || "",
       candidate.workMode || "",
       candidate.currentSalary || "",
@@ -174,15 +181,31 @@ const Candidates: React.FC = () => {
         ? new Date(candidate.updatedAt).toLocaleDateString("en-GB")
         : "",
     ]);
-  
+
     // Add headers as the first row
     const finalData = [headers, ...exportData];
-  
+
     // Create worksheet and workbook
     const ws = XLSX.utils.aoa_to_sheet(finalData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "All Candidates Data");
-  
+
+    // Apply styles to the headers
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "FFFFFF" } }, // White font color
+      fill: { fgColor: { rgb: "007ACC" } }, // Blue background
+      alignment: { horizontal: "center" },
+    };
+
+    // Apply styles only to header row
+    const range = XLSX.utils.decode_range(ws["!ref"] || "");
+    for (let col = range.s.c; col <= range.e.c; col++) {
+      const cell = ws[XLSX.utils.encode_cell({ r: 0, c: col })];
+      if (cell) {
+        cell.s = headerStyle; // Apply headerStyle to each header cell
+      }
+    }
+
     // Auto-fit columns for better readability
     const maxColWidths = headers.map((header, i) =>
       Math.max(
@@ -190,14 +213,13 @@ const Candidates: React.FC = () => {
         ...exportData.map((row) => (row[i] ? row[i].toString().length : 0))
       )
     );
-  
+
     ws["!cols"] = maxColWidths.map((width) => ({ wch: width + 5 }));
-  
+
     // Trigger download
-    XLSX.writeFile(wb, "All_Candidates_Report.xlsx");
+    XLSX.writeFile(wb, "Candidates_Report.xlsx");
   };
-  
-  
+
   const indexOfLastCandidate = currentPage * candidatesPerPage;
   const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
   const currentCandidates = filteredCandidates.slice(
@@ -214,15 +236,15 @@ const Candidates: React.FC = () => {
         <div className="flex flex-wrap gap-4 mb-4">
           <input
             type="text"
-            placeholder="Search by name"
+            placeholder="Search by name, email, or phone number"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border border-gray-300 p-2 rounded w-58"
+            className="border border-gray-300 p-2 rounded w-70 sm:w-70 md:w-70"
           />
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="border border-gray-300 p-2 rounded w-59"
+            className="border border-gray-300 p-2 rounded w-70 sm:w-70 md:w-70"
           >
             <option value="">Filter By Offer Status</option>
             <option value="Released">RELEASED</option>
@@ -233,19 +255,19 @@ const Candidates: React.FC = () => {
 
           <button
             onClick={resetFilters}
-            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-40"
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600  sm:w-40 md:w-40"
           >
             Reset Filters
           </button>
           <button
             onClick={exportToExcel}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-40"
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600  sm:w-40 md:w-40"
           >
             Export to Excel
           </button>
           <button
             onClick={() => navigate("/recruitmentForm")}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-40"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 sm:w-40 md:w-40"
           >
             + Add Candidate
           </button>

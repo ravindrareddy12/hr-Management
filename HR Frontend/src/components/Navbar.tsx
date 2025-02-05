@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaUserCircle } from "react-icons/fa";
+import { FaSignOutAlt } from "react-icons/fa"; // Updated import
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -42,7 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ userName }) => {
         toast.success("Successfully logged out!");
 
         // Immediately navigate to the login page
-        navigate("/login"); // Ensure this is called after the logout process completes
+        navigate("/login");
       })
       .catch((err) => {
         // Handle error
@@ -74,7 +74,7 @@ const Navbar: React.FC<NavbarProps> = ({ userName }) => {
 
         {/* User Section */}
         <div className="flex items-center space-x-4">
-          <FaUserCircle className="w-8 h-8 text-gray-500 hover:text-blue-500 cursor-pointer" />
+          <FaSignOutAlt className="w-8 h-8 text-gray-500 hover:text-blue-500 cursor-pointer" />
           <button
             onClick={handleLogout}
             className="text-gray-500 hover:text-blue-500 focus:outline-none"

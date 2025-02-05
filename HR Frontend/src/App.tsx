@@ -13,6 +13,8 @@ import Navbar from "./components/Navbar";
 import DropdownsManager from "./components/DropdownsManager";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
+import Users from "./components/auth/Users";
+
 
 const App: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);
@@ -45,6 +47,8 @@ const App: React.FC = () => {
                     <Route path="/" element={<Navigate to="/candidates" />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/candidates" element={<Candidates />} />
+                    <Route path="/users" element={<Users/>} />
+
                     <Route
                       path="/recruitmentForm/:id?"
                       element={<RecruitmentForm />}
