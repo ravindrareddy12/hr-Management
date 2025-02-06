@@ -9,7 +9,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const candidateRoutes = require('./routes/candidateRoutes');
 const dropdownRoutes = require("./routes/dropdownRoutes");
-
+const userRoutes = require("./routes/userRoutes");
 // Load environment variables
 dotenv.config();
 
@@ -53,6 +53,7 @@ app.use(session({
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/candidates', candidateRoutes);
-// Start the server
+app.use("/api/users", userRoutes);
+// Start the servercr
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

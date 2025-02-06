@@ -11,22 +11,29 @@ const Users: React.FC = () => {
     selectedRole: "team-member",
     selectedTeamLeader: "",
   });
+
   const [teamLeaders, setTeamLeaders] = useState<any[]>([]);
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate fetching team leaders from API
-    setTeamLeaders([
-      { id: 1, username: "leader1" },
-      { id: 2, username: "leader2" },
-      { id: 3, username: "leader3" },
-    ]);
-    setTeamMembers([
-      { id: 1, username: "member1" },
-      { id: 2, username: "member2" },
-    ]);
+    fetchUsers();
   }, []);
+
+  // Fetch all users from backend
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users`, {
+        withCredentials: true,
+      });
+      const users = res.data;
+
+      setTeamLeaders(users.filter((user: any) => user.role === "team-leader"));
+      setTeamMembers(users.filter((user: any) => user.role === "team-member"));
+    } catch (err: any) {
+      toast.error("Error fetching users");
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -37,7 +44,6 @@ const Users: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const { username, email, password, selectedRole, selectedTeamLeader } =
       formData;
 
@@ -55,66 +61,65 @@ const Users: React.FC = () => {
       username,
       email,
       password,
-      teamLeader:
-        selectedRole === "team-member" ? selectedTeamLeader : undefined,
+      role: selectedRole,
+      teamLeader: selectedRole === "team-member" ? selectedTeamLeader : null,
     };
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/${
-          selectedRole === "team-leader" ? "team-leaders" : "team-members"
-        }/create`,
-        data,
-        { withCredentials: true }
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/users/create`, data, {
+        withCredentials: true,
+      });
+
+      toast.success(
+        `${selectedRole === "team-leader" ? "Team Leader" : "Team Member"} created successfully!`
       );
 
-      if (res.status === 200) {
-        toast.success(
-          `${
-            selectedRole === "team-leader" ? "Team Leader" : "Team Member"
-          } created successfully!`
-        );
-        setFormData({
-          username: "",
-          email: "",
-          password: "",
-          selectedRole: "team-member",
-          selectedTeamLeader: "",
-        });
-      }
+      // Reset form
+      setFormData({
+        username: "",
+        email: "",
+        password: "",
+        selectedRole: "team-member",
+        selectedTeamLeader: "",
+      });
+
+      fetchUsers(); // Refresh the user list
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to create user");
     }
   };
 
-  const handleDelete = (id: number, role: "team-leader" | "team-member") => {
-    // Handle delete logic here
-    console.log(`Deleting ${role} with ID: ${id}`);
-  };
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
+        withCredentials: true,
+      });
 
-  const { username, email, password, selectedRole, selectedTeamLeader } =
-    formData;
+      toast.success("User deleted successfully");
+      fetchUsers(); // Refresh the list
+    } catch (err: any) {
+      toast.error("Error deleting user");
+    }
+  };
 
   return (
     <div className="bg-gray-100 flex flex-wrap gap-6 p-8">
       {/* Form Card */}
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">
-          Create{" "}
-          {selectedRole === "team-leader" ? "Team Leader" : "Team Member"}
+          Create {formData.selectedRole === "team-leader" ? "Team Leader" : "Team Member"}
         </h3>
         {error && <p className="text-red-600 mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Dropdown to select role (Team Leader or Team Member) */}
           <div>
             <label className="block text-sm font-medium text-gray-600">
               Select Role
             </label>
             <select
               name="selectedRole"
-              value={selectedRole}
+              value={formData.selectedRole}
               onChange={handleChange}
-              className="w-full px-4 py-2 mt-1 text-gray-800 bg-gray-200 border rounded-lg focus:ring focus:outline-none"
+              className="w-full px-4 py-2 mt-1 bg-gray-200 border rounded-lg"
               required
             >
               <option value="team-leader">Create Team Leader</option>
@@ -122,67 +127,51 @@ const Users: React.FC = () => {
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600">
-              Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              value={username}
-              onChange={handleChange}
-              className="w-full px-4 py-2 mt-1 text-gray-800 bg-gray-200 border rounded-lg focus:ring focus:outline-none"
-              placeholder="Enter username"
-              required
-            />
-          </div>
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            placeholder="Enter username"
+            required
+            className="w-full px-4 py-2 mt-1 bg-gray-200 border rounded-lg"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={handleChange}
-              className="w-full px-4 py-2 mt-1 text-gray-800 bg-gray-200 border rounded-lg focus:ring focus:outline-none"
-              placeholder="Enter email"
-              required
-            />
-          </div>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Enter email"
+            required
+            className="w-full px-4 py-2 mt-1 bg-gray-200 border rounded-lg"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={password}
-              onChange={handleChange}
-              className="w-full px-4 py-2 mt-1 text-gray-800 bg-gray-200 border rounded-lg focus:ring focus:outline-none"
-              placeholder="Enter password"
-              required
-            />
-          </div>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter password"
+            required
+            className="w-full px-4 py-2 mt-1 bg-gray-200 border rounded-lg"
+          />
 
-          {/* Show Team Leader dropdown only if creating a Team Member */}
-          {selectedRole === "team-member" && (
+          {formData.selectedRole === "team-member" && (
             <div>
               <label className="block text-sm font-medium text-gray-600">
                 Select Team Leader
               </label>
               <select
                 name="selectedTeamLeader"
-                value={selectedTeamLeader}
+                value={formData.selectedTeamLeader}
                 onChange={handleChange}
-                className="w-full px-4 py-2 mt-1 text-gray-800 bg-gray-200 border rounded-lg focus:ring focus:outline-none"
+                className="w-full px-4 py-2 mt-1 bg-gray-200 border rounded-lg"
                 required
               >
                 <option value="">Select a Team Leader</option>
                 {teamLeaders.map((leader) => (
-                  <option key={leader.id} value={leader.username}>
+                  <option key={leader._id} value={leader._id}>
                     {leader.username}
                   </option>
                 ))}
@@ -192,52 +181,35 @@ const Users: React.FC = () => {
 
           <button
             type="submit"
-            // className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 hover:text-white sm:w-40 md:w-40"
-
-            className="w-full px-4 py-2 text-white bg-gray-800 rounded-lg hover:bg-blue-800 text-sm"
+            className="w-full px-4 py-2 text-white bg-gray-800 rounded-lg hover:bg-blue-800"
           >
-            Create{" "}
-            {selectedRole === "team-leader" ? "Team Leader" : "Team Member"}
+            Create {formData.selectedRole === "team-leader" ? "Team Leader" : "Team Member"}
           </button>
         </form>
       </div>
 
-      {/* Users List Card */}
+      {/* Users List */}
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">
           Users List: Team Leaders & Members
         </h3>
         <div className="overflow-x-auto">
-          <table className="min-w-full table-auto text-sm text-left text-gray-800">
+          <table className="min-w-full table-auto text-sm text-left">
             <thead className="bg-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left border-b">Username</th>
-                <th className="px-6 py-3 text-left border-b">Role</th>
-                <th className="px-6 py-3 text-left border-b">Actions</th>
+                <th className="px-6 py-3 border-b">Username</th>
+                <th className="px-6 py-3 border-b">Role</th>
+                <th className="px-6 py-3 border-b">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {teamLeaders.map((leader) => (
-                <tr key={leader.id} className="border-b">
-                  <td className="px-6 py-4">{leader.username}</td>
-                  <td className="px-6 py-4">Team Leader</td>
+              {[...teamLeaders, ...teamMembers].map((user) => (
+                <tr key={user._id} className="border-b">
+                  <td className="px-6 py-4">{user.username}</td>
+                  <td className="px-6 py-4">{user.role}</td>
                   <td className="px-6 py-4">
                     <button
-                      onClick={() => handleDelete(leader.id, "team-leader")}
-                      className="text-red-600 hover:text-red-800 bg-transparent hover:bg-gray-200 px-4 py-2 rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {teamMembers.map((member) => (
-                <tr key={member.id} className="border-b">
-                  <td className="px-6 py-4">{member.username}</td>
-                  <td className="px-6 py-4">Team Member</td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() => handleDelete(member.id, "team-member")}
+                      onClick={() => handleDelete(user._id)}
                       className="text-red-600 hover:text-red-800 bg-transparent hover:bg-gray-200 px-4 py-2 rounded"
                     >
                       Delete
