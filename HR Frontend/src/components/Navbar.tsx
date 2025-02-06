@@ -74,10 +74,10 @@ const Navbar: React.FC<NavbarProps> = ({ userName }) => {
 
         {/* User Section */}
         <div className="flex items-center space-x-4">
-          <FaSignOutAlt className="w-8 h-8 text-gray-500 hover:text-blue-500 cursor-pointer" />
+          <FaSignOutAlt className="w-8 h-8 text-blue-500 hover:text-blue-500 cursor-pointer" />
           <button
             onClick={handleLogout}
-            className="text-gray-500 hover:text-blue-500 focus:outline-none"
+            className="text-black-500 hover:text-blue-500 focus:outline-none"
           >
             Logout
           </button>

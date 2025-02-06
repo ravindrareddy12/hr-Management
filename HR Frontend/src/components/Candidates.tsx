@@ -1,8 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx"; // Correct import
+import AlertMessage from "./AlertMessage";
 
 interface Candidate {
+  totalYearsOfExperience: string;
+  noticePeriod: string;
+  workMode: string;
+  currentSalary: string;
+  expectedSalary: string;
+  internalInterviewDate: any;
+  internalInterviewStatus: string;
+  clientInterviewDate: any;
+  clientInterviewStatus: string;
+  selectionDate: any;
+  salaryOffered: string;
+  offerDate: any;
+  epRequest: string;
+  joiningDate: any;
+  remarks: string;
+  createdAt: any;
+  updatedAt: any;
+  nationality: string;
+  location: string;
+  dateOfRequirement: any;
+  am: string;
+  taName: string;
+  tlName: string;
+  phoneNumber: any;
+  email: any;
   _id: string;
   candidateName: string;
   position: string;
@@ -14,6 +40,8 @@ interface Candidate {
 
 const Candidates: React.FC = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>(""); // State for error message
+
   const [filteredCandidates, setFilteredCandidates] = useState<Candidate[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [candidatesPerPage] = useState(8);
@@ -90,7 +118,7 @@ const Candidates: React.FC = () => {
   };
   const exportToExcel = () => {
     if (filteredCandidates.length === 0) {
-      alert("No data available to export.");
+      setErrorMessage("No data available to export!");
       return;
     }
 
@@ -231,12 +259,20 @@ const Candidates: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
+      {errorMessage && (
+        <AlertMessage
+          message={errorMessage}
+          onClose={() => setErrorMessage("")}
+          type={"info"}
+        />
+      )}
+
       <div className="flex flex-col space-y-4 mb-5">
         <h1 className="text-xl font-bold">Candidates Management</h1>
         <div className="flex flex-wrap gap-4 mb-4">
           <input
             type="text"
-            placeholder="Search by name, email, or phone number"
+            placeholder="Search ..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="border border-gray-300 p-2 rounded w-70 sm:w-70 md:w-70"

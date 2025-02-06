@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaChartLine, FaUserFriends } from "react-icons/fa";
+import { FaChartLine, FaUserFriends, FaUserLock } from "react-icons/fa";
 const Sidebar: React.FC = () => {
   return (
     <div className="w-40 h-screen bg-white p-4 flex flex-col">
@@ -38,10 +38,11 @@ const Sidebar: React.FC = () => {
               ({ isActive }) =>
                 isActive
                   ? "flex items-center space-x-3 text-blue-400 font-medium"
-                  : "flex items-center space-x-3 text-gray-300 hover:text-blue-400" // text-black-300 corrected to text-gray-300 for consistency
+                  : "flex items-center space-x-3 text-black-300 hover:text-blue-400" // text-black-300 corrected to text-gray-300 for consistency
             }
           >
-            <FaUserFriends className="w-5 h-5" />
+            <FaUserLock className="w-5 h-5" />
+            {/* <FontAwesomeIcon icon="fa-solid fa-user-lock" /> */}
             <span>Users</span>
           </NavLink>
         </li>
