@@ -61,7 +61,7 @@ const Login = () => {
               required
             />
           </div>
-          <button className="w-full px-4 py-2 mt-6 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+          <button className="w-full px-4 py-2 mt-6 text-white bg-gray-800 rounded-lg hover:bg-blue-800">
             Login
           </button>
         </form>
@@ -69,7 +69,7 @@ const Login = () => {
           Don't have an account?{" "}
           <button
             // onClick={handleContactClick} // Trigger registration page navigation
-            className="text-blue-600 hover:underline"
+            className="text-gray-800 hover:text-blue-800"
           >
             Contact Administrator or Team Leader for Registration
           </button>

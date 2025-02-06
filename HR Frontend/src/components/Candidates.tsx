@@ -291,19 +291,19 @@ const Candidates: React.FC = () => {
 
           <button
             onClick={resetFilters}
-            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600  sm:w-40 md:w-40"
+            className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-blue-800 hover:text-white sm:w-40 md:w-40"
           >
             Reset Filters
           </button>
           <button
             onClick={exportToExcel}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600  sm:w-40 md:w-40"
+            className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-blue-800 hover:text-white sm:w-40 md:w-40"
           >
             Export to Excel
           </button>
           <button
             onClick={() => navigate("/recruitmentForm")}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 sm:w-40 md:w-40"
+            className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-blue-800 hover:text-white sm:w-40 md:w-40"
           >
             + Add Candidate
           </button>
@@ -345,13 +345,13 @@ const Candidates: React.FC = () => {
                 <td className="border border-gray-300 p-2">
                   <button
                     onClick={() => handleEdit(candidate._id)}
-                    className="text-blue-500 hover:underline"
+                    className="text-blue-600 hover:text-blue-800 bg-transparent hover:bg-gray-200 px-4 py-2 rounded"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(candidate._id)}
-                    className="text-red-500 hover:underline ml-4"
+                    className="text-red-600 hover:text-red-800 bg-transparent hover:bg-gray-200 px-4 py-2 rounded"
                   >
                     Delete
                   </button>
@@ -375,7 +375,7 @@ const Candidates: React.FC = () => {
                     onClick={() => paginate(index + 1)}
                     className={`px-4 py-2 rounded ${
                       currentPage === index + 1
-                        ? "bg-blue-500 text-white"
+                        ? "bg-gray-800 text-white"
                         : "bg-gray-200 hover:bg-gray-300"
                     }`}
                   >

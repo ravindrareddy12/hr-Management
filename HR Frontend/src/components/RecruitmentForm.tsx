@@ -24,7 +24,7 @@ const RecruitmentForm: React.FC = () => {
     phoneNumber: "",
     email: "",
     noticePeriod: "",
-    totalYearsOfExperience:"",
+    totalYearsOfExperience: "",
     workMode: "",
     currentSalary: "",
     expectedSalary: "",
@@ -344,11 +344,10 @@ const RecruitmentForm: React.FC = () => {
               className="input border p-2 rounded w-full"
             />
           </div>
-          
         </div>
 
         <div className="grid grid-cols-3 gap-4 pt-5">
-        <div>
+          <div>
             <label
               className="block text-sm font-medium text-gray-700"
               htmlFor="totalYearsOfExperience"
@@ -622,7 +621,8 @@ const RecruitmentForm: React.FC = () => {
         <div className="pt-5">
           <button
             type="submit"
-            className="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600"
+            // className="bg-gray-400 text-blue-800 px-4 py-2 rounded hover:bg-gray-100 sm:w-40 md:w-40"
+            className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-blue-800 hover:text-white sm:w-40 md:w-40"
           >
             {id ? "Update Candidate" : "Add Candidate"}
           </button>

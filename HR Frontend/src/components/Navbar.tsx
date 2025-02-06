@@ -57,27 +57,31 @@ const Navbar: React.FC<NavbarProps> = ({ userName }) => {
 
   return (
     <>
-      <div className="flex justify-between bg-white shadow p-4">
+      <div className="flex justify-between bg-gray-100 shadow-lg p-4">
         {/* Logo Section */}
         <div className="flex items-center">
-          <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg font-bold">
+          <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-white text-lg font-bold">
             HR
           </div>
-          <span className="text-black text-lg font-semibold ml-2">HRFlow</span>
+          <span className="text-gray-800 text-lg font-semibold ml-2 hover:text-blue-800 ">
+            HRFlow
+          </span>
         </div>
 
         {/* Greeting Section */}
         <div className="ml-6">
-          <h2 className="text-xl font-semibold">Hi, {userName}</h2>
-          <p className="text-gray-500">{currentDate}</p>
+          <h2 className="text-xl  text-gray-800 hover:text-blue-800 font-semibold">
+            Hi, {userName}
+          </h2>
+          <p className="text-gray-600 hover:text-blue-800">{currentDate}</p>
         </div>
 
         {/* User Section */}
         <div className="flex items-center space-x-4">
-          <FaSignOutAlt className="w-8 h-8 text-blue-500 hover:text-blue-500 cursor-pointer" />
+          <FaSignOutAlt className="w-8 h-8 text-gray-800 hover:text-blue-800 cursor-pointer" />
           <button
             onClick={handleLogout}
-            className="text-black-500 hover:text-blue-500 focus:outline-none"
+            className="text-gray-800 hover:text-blue-800 focus:outline-none"
           >
             Logout
           </button>

@@ -192,7 +192,9 @@ const Users: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 text-sm"
+            // className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 hover:text-white sm:w-40 md:w-40"
+
+            className="w-full px-4 py-2 text-white bg-gray-800 rounded-lg hover:bg-blue-800 text-sm"
           >
             Create{" "}
             {selectedRole === "team-leader" ? "Team Leader" : "Team Member"}
@@ -206,8 +208,8 @@ const Users: React.FC = () => {
           Users List: Team Leaders & Members
         </h3>
         <div className="overflow-x-auto">
-          <table className="min-w-full table-auto text-sm text-left text-gray-600">
-            <thead className="bg-gray-100">
+          <table className="min-w-full table-auto text-sm text-left text-gray-800">
+            <thead className="bg-gray-200">
               <tr>
                 <th className="px-6 py-3 text-left border-b">Username</th>
                 <th className="px-6 py-3 text-left border-b">Role</th>
@@ -222,7 +224,7 @@ const Users: React.FC = () => {
                   <td className="px-6 py-4">
                     <button
                       onClick={() => handleDelete(leader.id, "team-leader")}
-                      className="text-red-600 hover:text-red-800"
+                      className="text-red-600 hover:text-red-800 bg-transparent hover:bg-gray-200 px-4 py-2 rounded"
                     >
                       Delete
                     </button>
@@ -236,7 +238,7 @@ const Users: React.FC = () => {
                   <td className="px-6 py-4">
                     <button
                       onClick={() => handleDelete(member.id, "team-member")}
-                      className="text-red-600 hover:text-red-800"
+                      className="text-red-600 hover:text-red-800 bg-transparent hover:bg-gray-200 px-4 py-2 rounded"
                     >
                       Delete
                     </button>

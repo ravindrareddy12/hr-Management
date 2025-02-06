@@ -15,7 +15,6 @@ import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import Users from "./components/auth/Users";
 
-
 const App: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);
 
@@ -40,25 +39,26 @@ const App: React.FC = () => {
           element={
             <>
               <Navbar userName={userName || "User"} />
-              <div className="flex">
-                <Sidebar />
-                <div className="flex-1 p-4">
-                  <Routes>
-                    <Route path="/" element={<Navigate to="/candidates" />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/candidates" element={<Candidates />} />
-                    <Route path="/users" element={<Users/>} />
-
-                    <Route
-                      path="/recruitmentForm/:id?"
-                      element={<RecruitmentForm />}
-                    />
-                    <Route
-                      path="/dropdownsManager"
-                      element={<DropdownsManager />}
-                    />
-                    <Route path="*" element={<div>Page Not Found</div>} />
-                  </Routes>
+              <div className="flex flex-col h-screen">
+                <div className="flex flex-1">
+                  <Sidebar />
+                  <div className="flex-1 p-4 overflow-auto">
+                    <Routes>
+                      <Route path="/" element={<Navigate to="/candidates" />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/candidates" element={<Candidates />} />
+                      <Route path="/users" element={<Users />} />
+                      <Route
+                        path="/recruitmentForm/:id?"
+                        element={<RecruitmentForm />}
+                      />
+                      <Route
+                        path="/dropdownsManager"
+                        element={<DropdownsManager />}
+                      />
+                      <Route path="*" element={<div>Page Not Found</div>} />
+                    </Routes>
+                  </div>
                 </div>
               </div>
             </>
