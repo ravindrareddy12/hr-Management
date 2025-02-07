@@ -1,42 +1,71 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaChartLine, FaUserFriends, FaUserLock } from "react-icons/fa";
+import {
+  FaUserFriends,
+  FaUserLock,
+  FaArrowLeft,
+  FaArrowRight,
+} from "react-icons/fa";
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({
+  isSidebarOpen,
+  setIsSidebarOpen,
+}) => {
   return (
     <div
-      className="w-40 h-full bg-gray-100 p-4 flex flex-col mt-0.5"
-      style={{ boxShadow: "4px 0px 10px rgba(0, 0, 0, 0.1)" }}
+      className={`fixed top-16 left-0 h-full ${
+        isSidebarOpen ? "w-64" : "w-14"
+      } bg-gray-100 p-4 transition-all duration-300 flex flex-col shadow-md`}
     >
-      <ul className="space-y-2 flex-grow">
-        <li>
-          <NavLink
-            to="/candidates"
-            className={({ isActive }) =>
-              isActive
-                ? "flex items-center space-x-3 px-3 py-2 rounded bg-blue-100 text-blue-600 font-medium"
-                : "flex items-center space-x-3 px-3 py-2 rounded text-gray-800 hover:text-blue-600 hover:bg-gray-200"
-            }
-          >
-            <FaUserFriends className="w-5 h-5" />
-            <span>Candidates</span>
-          </NavLink>
-        </li>
+      {/* Toggle Button */}
+      <button
+        className="absolute top-5 right-[-5px] bg-white rounded-full shadow-lg border p-2 hover:bg-gray-200"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        {isSidebarOpen ? (
+          <FaArrowLeft className="w-3 h-3" />
+        ) : (
+          <FaArrowRight className="w-3 h-3" />
+        )}
+      </button>
 
-        <li>
-          <NavLink
-            to="/users"
-            className={({ isActive }) =>
-              isActive
-                ? "flex items-center space-x-3 px-3 py-2 rounded bg-blue-100 text-blue-600 font-medium"
-                : "flex items-center space-x-3 px-3 py-2 rounded text-gray-800 hover:text-blue-600 hover:bg-gray-200"
-            }
-          >
-            <FaUserLock className="w-5 h-5" />
-            <span>Users</span>
-          </NavLink>
-        </li>
-      </ul>
+      {/* Sidebar Menu */}
+      {isSidebarOpen && (
+        <ul className="space-y-2 pt-8">
+          <li>
+            <NavLink
+              to="/candidates"
+              className={({ isActive }) =>
+                isActive
+                  ? "flex items-center space-x-3 px-3 py-2 rounded bg-blue-800 text-white"
+                  : "flex items-center space-x-3 px-3 py-2 rounded hover:bg-gray-200 "
+              }
+            >
+              <FaUserFriends className="w-6 h-6" />
+              <span>Candidates</span>
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink
+              to="/users"
+              className={({ isActive }) =>
+                isActive
+                  ? "flex items-center space-x-3 px-3 py-2 rounded bg-blue-800 text-white"
+                  : "flex items-center space-x-3 px-3 py-2 rounded hover:bg-gray-200"
+              }
+            >
+              <FaUserLock className="w-6 h-6" />
+              <span>Users</span>
+            </NavLink>
+          </li>
+        </ul>
+      )}
     </div>
   );
 };

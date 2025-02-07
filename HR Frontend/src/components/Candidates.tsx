@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx"; // Correct import
 import AlertMessage from "./AlertMessage";
+import PageContainer from "./PageContainer";
 
 interface Candidate {
   totalYearsOfExperience: string;
@@ -258,59 +259,61 @@ const Candidates: React.FC = () => {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      {errorMessage && (
-        <AlertMessage
-          message={errorMessage}
-          onClose={() => setErrorMessage("")}
-          type={"info"}
-        />
-      )}
-
-      <div className="flex flex-col space-y-4 mb-5">
-        <h1 className="text-xl font-bold">Candidates Management</h1>
-        <div className="flex flex-wrap gap-4 mb-4">
-          <input
-            type="text"
-            placeholder="Search ..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border border-gray-300 p-2 rounded w-70 sm:w-70 md:w-70"
+    <PageContainer
+      title={"Candidates"}
+      description="Manage and view all candidates."
+    >
+      <div>
+        {errorMessage && (
+          <AlertMessage
+            message={errorMessage}
+            onClose={() => setErrorMessage("")}
+            type={"info"}
           />
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="border border-gray-300 p-2 rounded w-70 sm:w-70 md:w-70"
-          >
-            <option value="">Filter By Offer Status</option>
-            <option value="Released">RELEASED</option>
-            <option value="Accepted">ACCEPTED</option>
-            <option value="Pending">PENDING</option>
-            <option value="Declined">DECLINED</option>
-          </select>
+        )}
 
-          <button
-            onClick={resetFilters}
-            className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-blue-800 hover:text-white sm:w-40 md:w-40"
-          >
-            Reset Filters
-          </button>
-          <button
-            onClick={exportToExcel}
-            className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-blue-800 hover:text-white sm:w-40 md:w-40"
-          >
-            Export to Excel
-          </button>
-          <button
-            onClick={() => navigate("/recruitmentForm")}
-            className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-blue-800 hover:text-white sm:w-40 md:w-40"
-          >
-            + Add Candidate
-          </button>
+        <div className="flex flex-col space-y-4 mb-5">
+          <div className="flex flex-wrap gap-4 mb-4 pt-4">
+            <input
+              type="text"
+              placeholder="Search ..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="border border-gray-300 p-2 rounded w-70 sm:w-70 md:w-70"
+            />
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="border border-gray-300 p-2 rounded w-70 sm:w-70 md:w-70"
+            >
+              <option value="">Filter By Offer Status</option>
+              <option value="Released">RELEASED</option>
+              <option value="Accepted">ACCEPTED</option>
+              <option value="Pending">PENDING</option>
+              <option value="Declined">DECLINED</option>
+            </select>
+
+            <button
+              onClick={resetFilters}
+              className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-blue-800 hover:text-white sm:w-40 md:w-40"
+            >
+              Reset Filters
+            </button>
+            <button
+              onClick={exportToExcel}
+              className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-blue-800 hover:text-white sm:w-40 md:w-40"
+            >
+              Export to Excel
+            </button>
+            <button
+              onClick={() => navigate("/recruitmentForm")}
+              className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-blue-800 hover:text-white sm:w-40 md:w-40"
+            >
+              + Add Candidate
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="bg-white p-4 rounded-lg shadow-lg">
         <table className="w-full border-collapse border border-gray-300 text-left">
           <thead className="bg-gray-200">
             <tr>
@@ -345,13 +348,13 @@ const Candidates: React.FC = () => {
                 <td className="border border-gray-300 p-2">
                   <button
                     onClick={() => handleEdit(candidate._id)}
-                    className="text-blue-600 hover:text-blue-800 bg-transparent hover:bg-gray-200 px-4 py-2 rounded"
+                    className="text-blue-600 hover:text-blue-800 bg-transparent hover:bg-gray-800 px-4 py-2 rounded hover:text-white"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(candidate._id)}
-                    className="text-red-600 hover:text-red-800 bg-transparent hover:bg-gray-200 px-4 py-2 rounded"
+                    className="text-red-600 hover:text-red-800 bg-transparent hover:bg-blue-800 px-4 py-2 rounded hover:text-white"
                   >
                     Delete
                   </button>
@@ -387,7 +390,7 @@ const Candidates: React.FC = () => {
           </ul>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 
