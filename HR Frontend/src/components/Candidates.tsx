@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx"; // Correct import
 import AlertMessage from "./AlertMessage";
 import PageContainer from "./PageContainer";
+import { useAuth } from "../contexts/AuthContext"; // Import useAuth
 
 interface Candidate {
   totalYearsOfExperience: string;
@@ -50,6 +51,7 @@ const Candidates: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState("");
   const [dateRange, setDateRange] = useState<string>("");
   const navigate = useNavigate();
+  const { user } = useAuth(); // Get the logged-in user
 
   useEffect(() => {
     fetchCandidates();
@@ -346,18 +348,22 @@ const Candidates: React.FC = () => {
                   )}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  <button
-                    onClick={() => handleEdit(candidate._id)}
-                    className="text-blue-600 hover:text-blue-800 bg-transparent hover:bg-gray-800 px-4 py-2 rounded hover:text-white"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(candidate._id)}
-                    className="text-red-600 hover:text-red-800 bg-transparent hover:bg-blue-800 px-4 py-2 rounded hover:text-white"
-                  >
-                    Delete
-                  </button>
+                  {user?.role !== "team-member" && (
+                    <>
+                      <button
+                        onClick={() => handleEdit(candidate._id)}
+                        className="px-4 py-2 rounded bg-transparent text-blue-600 hover:text-white hover:bg-gray-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(candidate._id)}
+                        className="px-4 py-2 rounded bg-transparent text-red-600 hover:text-white hover:bg-blue-800"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}

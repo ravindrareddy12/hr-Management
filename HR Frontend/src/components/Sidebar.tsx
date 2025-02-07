@@ -6,6 +6,7 @@ import {
   FaArrowLeft,
   FaArrowRight,
 } from "react-icons/fa";
+import { useAuth } from "../contexts/AuthContext"; // Import useAuth
 
 interface SidebarProps {
   isSidebarOpen: boolean;
@@ -16,6 +17,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   isSidebarOpen,
   setIsSidebarOpen,
 }) => {
+  const { user } = useAuth(); // Get the logged-in user
+
   return (
     <div
       className={`fixed top-16 left-0 h-full ${
@@ -37,13 +40,14 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Sidebar Menu */}
       {isSidebarOpen && (
         <ul className="space-y-2 pt-8">
+          {/* Candidates Menu (Visible for All Users) */}
           <li>
             <NavLink
               to="/candidates"
               className={({ isActive }) =>
                 isActive
                   ? "flex items-center space-x-3 px-3 py-2 rounded bg-blue-800 text-white"
-                  : "flex items-center space-x-3 px-3 py-2 rounded hover:bg-gray-200 "
+                  : "flex items-center space-x-3 px-3 py-2 rounded hover:bg-gray-200"
               }
             >
               <FaUserFriends className="w-6 h-6" />
@@ -51,19 +55,22 @@ const Sidebar: React.FC<SidebarProps> = ({
             </NavLink>
           </li>
 
-          <li>
-            <NavLink
-              to="/users"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center space-x-3 px-3 py-2 rounded bg-blue-800 text-white"
-                  : "flex items-center space-x-3 px-3 py-2 rounded hover:bg-gray-200"
-              }
-            >
-              <FaUserLock className="w-6 h-6" />
-              <span>Users</span>
-            </NavLink>
-          </li>
+          {/* Users Menu (Restricted: Only Admin & Team Leaders can see this) */}
+          {user?.role !== "team-member" && (
+            <li>
+              <NavLink
+                to="/users"
+                className={({ isActive }) =>
+                  isActive
+                    ? "flex items-center space-x-3 px-3 py-2 rounded bg-blue-800 text-white"
+                    : "flex items-center space-x-3 px-3 py-2 rounded hover:bg-gray-200"
+                }
+              >
+                <FaUserLock className="w-6 h-6" />
+                <span>Users</span>
+              </NavLink>
+            </li>
+          )}
         </ul>
       )}
     </div>

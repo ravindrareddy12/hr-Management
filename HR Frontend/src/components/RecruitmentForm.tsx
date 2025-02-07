@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import PageContainer from "./PageContainer";
+import { useAuth } from "../contexts/AuthContext"; // Import useAuth
 
 interface FormData {
   [key: string]: string | null;
 }
 
 const RecruitmentForm: React.FC = () => {
+  const { user } = useAuth(); // Get the logged-in user
+
   const { id } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
