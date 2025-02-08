@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "react-toastify/dist/ReactToastify.css";
-import PageContainer from "../PageContainer";
+import PageContainer from "../layout/PageContainer";
 import AlertMessages from "../AlertMessage";
 
 const Users: React.FC = () => {

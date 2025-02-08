@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx"; // Correct import
-import AlertMessage from "./AlertMessage";
-import PageContainer from "./PageContainer";
-import { useAuth } from "../contexts/AuthContext"; // Import useAuth
+import AlertMessage from "../AlertMessage";
+import PageContainer from "../layout/PageContainer";
+import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
 
 interface Candidate {
   totalYearsOfExperience: string;
@@ -36,7 +36,7 @@ interface Candidate {
   position: string;
   client: string;
   workStatus: string;
-  dateOfSubmission: string;
+  dateOfSubmission: any;
   offerStatus: string;
 }
 
@@ -77,6 +77,9 @@ const Candidates: React.FC = () => {
 
   const handleEdit = (id: string) => {
     navigate(`/recruitmentForm/${id}`);
+  };
+  const handleView = (id: string) => {
+    navigate(`/candidateDetails/${id}`); // Redirects to the candidate details page
   };
 
   const applyFilters = () => {
@@ -348,8 +351,8 @@ const Candidates: React.FC = () => {
                   )}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {user?.role !== "team-member" && (
-                    <>
+                  {user?.role !== "team-member" ? (
+                    <div className="flex space-x-2">
                       <button
                         onClick={() => handleEdit(candidate._id)}
                         className="px-4 py-2 rounded bg-transparent text-blue-600 hover:text-white hover:bg-gray-800"
@@ -362,7 +365,20 @@ const Candidates: React.FC = () => {
                       >
                         Delete
                       </button>
-                    </>
+                      <button
+                        onClick={() => handleView(candidate._id)}
+                        className="px-4 py-2 rounded bg-transparent text-gray-800 hover:text-white hover:bg-blue-800"
+                      >
+                        View
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleView(candidate._id)}
+                      className="px-4 py-2 rounded bg-transparent text-gray-800 hover:text-white hover:bg-blue-800"
+                    >
+                      View
+                    </button>
                   )}
                 </td>
               </tr>

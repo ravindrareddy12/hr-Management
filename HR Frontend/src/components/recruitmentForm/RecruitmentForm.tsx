@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import PageContainer from "./PageContainer";
-import { useAuth } from "../contexts/AuthContext"; // Import useAuth
+import PageContainer from "../layout/PageContainer";
+import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
 
 interface FormData {
   [key: string]: string | null;

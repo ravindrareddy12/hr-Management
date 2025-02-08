@@ -1,21 +1,19 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
-import Footer from "./Footer";
 
 interface LayoutProps {
-  userName: string;
   children: React.ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({ userName, children }) => {
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   return (
     <div className="h-screen grid grid-rows-[auto_1fr_auto]">
       {/* Navbar */}
       <div className="fixed top-0 left-0 w-full z-50">
-        <Navbar userName={userName} />
+        <Navbar  />
       </div>
 
       {/* Main Content */}
