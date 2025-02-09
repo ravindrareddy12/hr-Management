@@ -10,11 +10,11 @@ import Users from "./auth/Users";
 import CandidateDetails from "./candidate/CandidateDetails";
 import Layout from "./layout/layout";
 
-
+import { useAuth } from "../contexts/AuthContext";
 
 const RoutesComponent: React.FC = () => {
 
-  
+  const { user } = useAuth();
   
   return (
     <Routes>
@@ -34,7 +34,9 @@ const RoutesComponent: React.FC = () => {
                 path="/candidateDetails/:id"
                 element={<CandidateDetails />}
               />
-              <Route path="/users" element={<Users />} />
+                {user?.role !== "team-member" && (
+                <Route path="/users" element={<Users />} />
+              )}
               <Route
                 path="/recruitmentForm/:id?"
                 element={<RecruitmentForm />}
