@@ -1,44 +1,49 @@
 import React, { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useAuth } from "../../contexts/AuthContext"; 
+import { useAuth } from "../../contexts/AuthContext";
+import AlertMessages from "../AlertMessage"; // Import the alert component
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [showAlert, setShowAlert] = useState(false); // State to control alert visibility
   const navigate = useNavigate();
-  const { user,setUser } = useAuth();
+  const { setUser } = useAuth();
+
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/login`,
         { email, password },
         { withCredentials: true }
       );
-   console.log(res)
       if (res.status === 200) {
-        // window.location.reload();
- setUser(res.data.user)
-        localStorage.setItem("userName", res.data.user.username); // Store username
-        navigate("/candidates"); // Redirect after login
+        setUser(res.data.user);
+        localStorage.setItem("userName", res.data.user.username);
+        navigate("/dashboard");
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "An error occurred");
+      const errorMsg = err.response?.data?.message || "An error occurred";
+      setError(errorMsg);
+      setShowAlert(true); // Show alert when there's an error
     }
-  };
-
-  const handleContactClick = () => {
-    navigate("/register"); // Redirect to registration page when clicked
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      {/* Show alert if there's an error */}
+      {showAlert && error && (
+        <AlertMessages
+          message={error}
+          type="error"
+          onClose={() => setShowAlert(false)}
+        />
+      )}
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center text-gray-700">Login</h2>
-        {error && <p className="mt-4 text-red-600">{error}</p>}
         <form onSubmit={handleLogin} className="mt-6">
           <div>
             <label className="block text-sm font-medium text-gray-600">
@@ -70,10 +75,7 @@ const Login = () => {
         </form>
         <p className="mt-4 text-sm text-center text-gray-600">
           Don't have an account?{" "}
-          <button
-            // onClick={handleContactClick} // Trigger registration page navigation
-            className="text-gray-800 hover:text-blue-800"
-          >
+          <button className="text-gray-800 hover:text-blue-800">
             Contact Administrator or Team Leader for Registration
           </button>
         </p>

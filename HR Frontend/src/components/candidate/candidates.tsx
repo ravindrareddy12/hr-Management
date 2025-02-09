@@ -164,18 +164,20 @@ const Candidates: React.FC = () => {
     ];
 
     // Prepare the data
+    const formatDateForExcel = (date) => {
+      return date && new Date(date).getTime() !== 0
+        ? new Date(date).toISOString().split("T")[0] // Convert to YYYY-MM-DD
+        : "";
+    };
+
     const exportData = filteredCandidates.map((candidate) => [
       candidate.tlName || "",
       candidate.taName || "",
       candidate.am || "",
       candidate.client || "",
       candidate.position || "",
-      candidate.dateOfRequirement
-        ? new Date(candidate.dateOfRequirement).toLocaleDateString("en-GB")
-        : "",
-      candidate.dateOfSubmission
-        ? new Date(candidate.dateOfSubmission).toLocaleDateString("en-GB")
-        : "",
+      formatDateForExcel(candidate.dateOfRequirement),
+      formatDateForExcel(candidate.dateOfSubmission),
       candidate.candidateName || "",
       candidate.location || "",
       candidate.nationality || "",
@@ -187,33 +189,19 @@ const Candidates: React.FC = () => {
       candidate.workMode || "",
       candidate.currentSalary || "",
       candidate.expectedSalary || "",
-      candidate.internalInterviewDate
-        ? new Date(candidate.internalInterviewDate).toLocaleDateString("en-GB")
-        : "",
+      formatDateForExcel(candidate.internalInterviewDate),
       candidate.internalInterviewStatus || "",
-      candidate.clientInterviewDate
-        ? new Date(candidate.clientInterviewDate).toLocaleDateString("en-GB")
-        : "",
+      formatDateForExcel(candidate.clientInterviewDate),
       candidate.clientInterviewStatus || "",
-      candidate.selectionDate
-        ? new Date(candidate.selectionDate).toLocaleDateString("en-GB")
-        : "",
+      formatDateForExcel(candidate.selectionDate),
       candidate.salaryOffered || "",
-      candidate.offerDate
-        ? new Date(candidate.offerDate).toLocaleDateString("en-GB")
-        : "",
+      formatDateForExcel(candidate.offerDate),
       candidate.offerStatus || "",
       candidate.epRequest || "",
-      candidate.joiningDate
-        ? new Date(candidate.joiningDate).toLocaleDateString("en-GB")
-        : "",
+      formatDateForExcel(candidate.joiningDate),
       candidate.remarks || "",
-      candidate.createdAt
-        ? new Date(candidate.createdAt).toLocaleDateString("en-GB")
-        : "",
-      candidate.updatedAt
-        ? new Date(candidate.updatedAt).toLocaleDateString("en-GB")
-        : "",
+      formatDateForExcel(candidate.createdAt),
+      formatDateForExcel(candidate.updatedAt),
     ]);
 
     // Add headers as the first row
@@ -332,7 +320,7 @@ const Candidates: React.FC = () => {
           </thead>
           <tbody>
             {currentCandidates.map((candidate) => (
-              <tr key={candidate._id} className="hover:bg-gray-100">
+              <tr key={candidate._id} className="hover:bg-gray-100 text-center">
                 <td className="border border-gray-300 p-2">
                   {candidate.candidateName}
                 </td>
@@ -346,13 +334,22 @@ const Candidates: React.FC = () => {
                   {candidate.offerStatus}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {new Date(candidate.dateOfSubmission).toLocaleDateString(
-                    "en-GB"
-                  )}
+                  {candidate.dateOfSubmission &&
+                  new Date(candidate.dateOfSubmission).getTime() !== 0
+                    ? new Date(candidate.dateOfSubmission).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        }
+                      )
+                    : ""}
                 </td>
-                <td className="border border-gray-300 p-2">
+
+                <td className="border border-gray-300 p-2 text-center">
                   {user?.role !== "team-member" ? (
-                    <div className="flex space-x-2">
+                    <>
                       <button
                         onClick={() => handleEdit(candidate._id)}
                         className="px-4 py-2 rounded bg-transparent text-blue-600 hover:text-white hover:bg-gray-800"
@@ -371,7 +368,7 @@ const Candidates: React.FC = () => {
                       >
                         View
                       </button>
-                    </div>
+                    </>
                   ) : (
                     <button
                       onClick={() => handleView(candidate._id)}

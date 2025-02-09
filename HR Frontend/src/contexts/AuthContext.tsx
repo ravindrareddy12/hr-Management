@@ -9,6 +9,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; // ✅ Add setUser
   loading: boolean;
   fetchUser: () => void;
   login: (credentials: { email: string; password: string }) => Promise<void>;
@@ -68,9 +69,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     fetchUser();
   }, []);
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setUser(JSON.parse(localStorage.getItem("user") || "null"));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, fetchUser, login, logout, setUser }}>
+    <AuthContext.Provider
+      value={{ user, loading, fetchUser, login, logout, setUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

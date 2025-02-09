@@ -9,42 +9,78 @@ import Users from "./auth/Users";
 import CandidateDetails from "./candidate/CandidateDetails";
 import Layout from "./layout/layout";
 import { useAuth } from "../contexts/AuthContext";
+import { FaLock } from "react-icons/fa";
+import NotFound from "./NotFound";
 
 const AccessDenied: React.FC = () => (
-  <div className="text-center text-red-600 text-xl font-bold mt-10">Access Denied</div>
+  <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <FaLock className="text-red-600 text-6xl mb-4" />
+    <h1 className="text-3xl font-bold text-red-600">Access Denied</h1>
+    <p className="text-gray-800 mt-2">
+      You do not have permission to view this page.
+    </p>
+    <a
+      href="/"
+      className="mt-4 px-6 py-2 bg-gray-800 text-white rounded hover:bg-blue-800 transition"
+    >
+      Go to Home
+    </a>
+  </div>
 );
+
+const ProtectedRoute: React.FC<{ element: React.ReactNode }> = ({
+  element,
+}) => {
+  const { user, loading } = useAuth();
+
+  if (loading) return <p>Loading...</p>; // Show loading while checking auth
+  return user ? <>{element}</> : <Navigate to="/login" replace />;
+};
 
 const RoutesComponent: React.FC = () => {
   const { user } = useAuth();
 
   return (
     <Routes>
-      {/* Routes without Navbar and Sidebar */}
+      {/* Public Route - Login */}
       <Route path="/login" element={<Login />} />
 
-      {/* Routes with Layout */}
+      {/* Protected Routes - Require Authentication */}
       <Route
         path="/*"
         element={
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/candidates" element={<Candidates />} />
-              <Route path="/candidateDetails/:id" element={<CandidateDetails />} />
-              <Route path="/recruitmentForm/:id?" element={<RecruitmentForm />} />
-              <Route path="/dropdownsManager" element={<DropdownsManager />} />
-              
-              {/* Restrict /users route for team members */}
-              {user?.role === "team-member" ? (
-                <Route path="/users" element={<AccessDenied />} />
-              ) : (
-                <Route path="/users" element={<Users />} />
-              )}
+          <ProtectedRoute
+            element={
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Navigate to="/dashboard" />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/candidates" element={<Candidates />} />
+                  <Route
+                    path="/candidateDetails/:id"
+                    element={<CandidateDetails />}
+                  />
+                  <Route
+                    path="/recruitmentForm/:id?"
+                    element={<RecruitmentForm />}
+                  />
+                  <Route
+                    path="/dropdownsManager"
+                    element={<DropdownsManager />}
+                  />
 
-              <Route path="*" element={<div>Page Not Found</div>} />
-            </Routes>
-          </Layout>
+                  {/* Restrict /users route for team members */}
+                  {user?.role === "team-member" ? (
+                    <Route path="/users" element={<AccessDenied />} />
+                  ) : (
+                    <Route path="/users" element={<Users />} />
+                  )}
+
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Layout>
+            }
+          />
         }
       />
     </Routes>

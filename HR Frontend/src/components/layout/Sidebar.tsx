@@ -6,7 +6,7 @@ import {
   FaArrowLeft,
   FaArrowRight,
 } from "react-icons/fa";
-import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
+import { useAuth } from "../../contexts/AuthContext";
 import PageContainer from "./PageContainer";
 
 interface SidebarProps {
@@ -18,7 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   isSidebarOpen,
   setIsSidebarOpen,
 }) => {
-  const { user } = useAuth(); // Get the logged-in user
+  const { user } = useAuth();
 
   return (
     <PageContainer title={""} description="">
@@ -40,54 +40,51 @@ const Sidebar: React.FC<SidebarProps> = ({
         </button>
 
         {/* Sidebar Menu */}
-        {isSidebarOpen && (
-          <ul className="space-y-2 pt-8">
-            {/* Candidates Menu (Visible for All Users) */}
-            <li>
-              <NavLink
-                to="/dashboard"
-                className={({ isActive }) =>
-                  isActive
-                    ? "flex items-center space-x-3 px-3 py-2 rounded bg-blue-800 text-white"
-                    : "flex items-center space-x-3 px-3 py-2 rounded hover:bg-gray-200"
-                }
-              >
-                <FaUserFriends className="w-6 h-6" />
-                <span>Dashboard</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/candidates"
-                className={({ isActive }) =>
-                  isActive
-                    ? "flex items-center space-x-3 px-3 py-2 rounded bg-blue-800 text-white"
-                    : "flex items-center space-x-3 px-3 py-2 rounded hover:bg-gray-200"
-                }
-              >
-                <FaUserFriends className="w-6 h-6" />
-                <span>Candidates</span>
-              </NavLink>
-            </li>
+        <ul className="space-y-2 pt-8">
+          <li>
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `flex items-center px-3 py-2 rounded ${
+                  isActive ? "bg-blue-800 text-white" : "hover:bg-gray-200"
+                }`
+              }
+            >
+              <FaUserFriends className="w-6 h-6" />
+              {isSidebarOpen && <span className="ml-3">Dashboard</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/candidates"
+              className={({ isActive }) =>
+                `flex items-center px-3 py-2 rounded ${
+                  isActive ? "bg-blue-800 text-white" : "hover:bg-gray-200"
+                }`
+              }
+            >
+              <FaUserFriends className="w-6 h-6" />
+              {isSidebarOpen && <span className="ml-3">Candidates</span>}
+            </NavLink>
+          </li>
 
-            {/* Users Menu (Restricted: Only Admin & Team Leaders can see this) */}
-            {user?.role !== "team-member" && (
-              <li>
-                <NavLink
-                  to="/users"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "flex items-center space-x-3 px-3 py-2 rounded bg-blue-800 text-white"
-                      : "flex items-center space-x-3 px-3 py-2 rounded hover:bg-gray-200"
-                  }
-                >
-                  <FaUserLock className="w-6 h-6" />
-                  <span>Users</span>
-                </NavLink>
-              </li>
-            )}
-          </ul>
-        )}
+          {/* Users Menu (Restricted) */}
+          {user?.role !== "team-member" && (
+            <li>
+              <NavLink
+                to="/users"
+                className={({ isActive }) =>
+                  `flex items-center px-3 py-2 rounded ${
+                    isActive ? "bg-blue-800 text-white" : "hover:bg-gray-200"
+                  }`
+                }
+              >
+                <FaUserLock className="w-6 h-6" />
+                {isSidebarOpen && <span className="ml-3">Users</span>}
+              </NavLink>
+            </li>
+          )}
+        </ul>
       </div>
     </PageContainer>
   );
