@@ -1,13 +1,14 @@
 import React, { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../../contexts/AuthContext"; 
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
+  const { user,setUser } = useAuth();
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -17,8 +18,10 @@ const Login = () => {
         { email, password },
         { withCredentials: true }
       );
-
+   console.log(res)
       if (res.status === 200) {
+        // window.location.reload();
+ setUser(res.data.user)
         localStorage.setItem("userName", res.data.user.username); // Store username
         navigate("/candidates"); // Redirect after login
       }

@@ -3,7 +3,7 @@ import { FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AlertMessages from "../AlertMessage";
-
+import { useAuth } from "../../contexts/AuthContext"; 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState<string | null>(null);
@@ -12,7 +12,7 @@ const Navbar: React.FC = () => {
     type: "success" as "success" | "error" | "info" | "warning" | "dark",
     show: false,
   });
-
+  const { user,setUser } = useAuth();
   useEffect(() => {
     setUserName(localStorage.getItem("userName"));
   }, []);
@@ -46,7 +46,7 @@ const Navbar: React.FC = () => {
         </div>
         <div className="text-center flex-1">
           <h2 className="text-xl text-gray-800 hover:text-blue-800 font-semibold">
-            Hi, {userName || "User"}
+            Hi, {user?.username || "User"}
           </h2>
         </div>
         <div className="flex items-center space-x-4">
