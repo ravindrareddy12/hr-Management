@@ -1,4 +1,5 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
   PieChart,
   Pie,
@@ -12,13 +13,24 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+const [data, setData] = useState([]);
 
-const data = [
-  { name: "Total Candidates", value: 400 },
-  { name: "Offers Made", value: 90 },
-  { name: "Candidates Joined", value: 30 },
-];
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/candidates/statistics`);
+      setData([
+        { name: "Total Candidates", value: response.data.totalCandidates },
+        { name: "Offers Made", value: response.data.offersMade },
+        { name: "Candidates Joined", value: response.data.candidatesJoined },
+      ]);
+    } catch (error) {
+      console.error("Error fetching candidate statistics:", error);
+    }
+  };
 
+  fetchData();
+}, []);
 const COLORS = ["#1E3A8A", "#10B981", "#F59E0B"];
 
 // Custom label function to position numbers inside the ring
@@ -120,3 +132,7 @@ const Charts = () => {
 };
 
 export default Charts;
+function fetchData() {
+  throw new Error("Function not implemented.");
+}
+
