@@ -12,37 +12,25 @@ import {
   LineChart,
   XAxis,
   YAxis,
+  Text,
 } from "recharts";
-import { fetchCandidateStatistics } from "./service";
 
+const API_URL = import.meta.env.VITE_API_URL;
 const COLORS = ["#1E3A8A", "#10B981", "#F59E0B"];
 
-const renderCustomLabel = ({
-  cx,
-  cy,
-  midAngle,
-  innerRadius,
-  outerRadius,
-  index,
-  data,
-}) => {
-  const RADIAN = Math.PI / 180;
-  const radius = innerRadius + (outerRadius - innerRadius) / 2;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-  return (
-    <text
-      x={x}
-      y={y}
-      fill="white"
-      textAnchor="middle"
-      dominantBaseline="central"
-      className="text-sm font-bold"
-    >
-      {data[index].value}
-    </text>
-  );
+const fetchCandidateStatistics = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/candidates/statistics/st`);
+    return [
+      { name: "Total Candidates", value: response.data.totalCandidates },
+      { name: "Offers Made", value: response.data.offersMade },
+      { name: "Candidates Joined", value: response.data.candidatesJoined },
+      { name: "monthlyData", value: response.data.monthlyData || [] },
+    ];
+  } catch (error) {
+    console.error("Error fetching candidate statistics:", error);
+    throw error;
+  }
 };
 
 const Charts = () => {
@@ -53,22 +41,18 @@ const Charts = () => {
     const fetchData = async () => {
       try {
         const stats = await fetchCandidateStatistics();
-        console.log(stats, "stats");
+        setData(stats);
 
-        // setData(stats);
-
-        const monthlyData =
-          stats.find((st) => st.name === "monthlyData")?.value || [];
-
+        const monthlyData = stats.find(
+          (st) => st.name === "monthlyData"
+        )?.value;
         if (Array.isArray(monthlyData)) {
-          const formattedData = monthlyData.map(({ month, applications }) => ({
-            date: month, // Correct field mapping
-            applications,
-          }));
-          console.log(formattedData, "formattedData");
-          setTimelineData(formattedData);
-        } else {
-          console.error("Invalid format for monthlyData", monthlyData);
+          setTimelineData(
+            monthlyData.map(({ month, applications }) => ({
+              date: month,
+              applications,
+            }))
+          );
         }
       } catch (error) {
         console.error("Error fetching candidate statistics:", error);
@@ -80,6 +64,7 @@ const Charts = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+      {/* Pie Chart */}
       <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
         <h3 className="text-xl font-semibold text-gray-700 mb-4 text-center">
           Candidate Status
@@ -88,14 +73,38 @@ const Charts = () => {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={data}
+                data={data.filter((item) => item.name !== "monthlyData")}
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
                 outerRadius={100}
                 paddingAngle={5}
                 dataKey="value"
-                label={(props) => renderCustomLabel({ ...props, data })}
+                label={({
+                  cx,
+                  cy,
+                  midAngle,
+                  innerRadius,
+                  outerRadius,
+                  index,
+                }) => {
+                  const RADIAN = Math.PI / 180;
+                  const radius = innerRadius + (outerRadius - innerRadius) / 2;
+                  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                  return (
+                    <Text
+                      x={x}
+                      y={y}
+                      fill="white"
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      className="text-sm font-bold"
+                    >
+                      {data[index].value}
+                    </Text>
+                  );
+                }}
                 labelLine={false}
               >
                 {data.map((entry, index) => (
@@ -112,6 +121,7 @@ const Charts = () => {
         </div>
       </div>
 
+      {/* Line Chart */}
       <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
         <h3 className="text-xl font-semibold text-gray-700 mb-4 text-center">
           Application Timeline
@@ -119,7 +129,7 @@ const Charts = () => {
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={timelineData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
+            <XAxis dataKey="date" />
             <YAxis />
             <Tooltip />
             <Line

@@ -1,6 +1,7 @@
 import React from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface Candidate {
   candidateName: string;
@@ -36,14 +37,16 @@ const RecentCandidates: React.FC<RecentCandidatesProps> = ({
   candidates,
   loading,
   error,
+  fetchCandidates,
 }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
   const handleDelete = async (id: string) => {
-    await fetch(`http://localhost:5003/api/candidates/${id}`, {
+    await fetch(API_URL + `/api/candidates/${id}`, {
       method: "DELETE",
     });
+    fetchCandidates();
   };
 
   const handleEdit = (id: string) => {

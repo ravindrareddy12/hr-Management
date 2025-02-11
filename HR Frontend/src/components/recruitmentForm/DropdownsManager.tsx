@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const DropdownsManager: React.FC = () => {
   const [dropdownData, setDropdownData] = useState<{
@@ -32,7 +33,7 @@ const DropdownsManager: React.FC = () => {
   useEffect(() => {
     // Fetch initial dropdown data from the backend
     axios
-      .get("http://localhost:5003/api/dropdowns")
+      .get(API_URL + "/api/dropdowns")
       .then((response) => {
         setDropdownData(response.data);
         setLoading(false);
@@ -68,7 +69,7 @@ const DropdownsManager: React.FC = () => {
       if (editing[field] !== null) {
         const updatedDropdown = [...dropdownData[field]];
         updatedDropdown[index] = editing[field]; // Update the specific option
-        await axios.post("http://localhost:5003/api/dropdowns", {
+        await axios.post(API_URL + "/api/dropdowns", {
           [field]: updatedDropdown,
         });
 
@@ -91,7 +92,7 @@ const DropdownsManager: React.FC = () => {
 
   const handleSaveAll = async (field: string) => {
     try {
-      await axios.post("http://localhost:5003/api/dropdowns", {
+      await axios.post(API_URL + "/api/dropdowns", {
         [field]: dropdownData[field],
       });
 

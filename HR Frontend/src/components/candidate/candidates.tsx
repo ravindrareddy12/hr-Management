@@ -4,6 +4,7 @@ import * as XLSX from "xlsx"; // Correct import
 import AlertMessage from "../AlertMessage";
 import PageContainer from "../layout/PageContainer";
 import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface Candidate {
   totalYearsOfExperience: string;
@@ -62,14 +63,14 @@ const Candidates: React.FC = () => {
   }, [searchTerm, filterStatus, dateRange, candidates]);
 
   const fetchCandidates = async () => {
-    const response = await fetch("http://localhost:5003/api/candidates");
+    const response = await fetch(API_URL + "/api/candidates");
     const data = await response.json();
     setCandidates(data);
     setFilteredCandidates(data);
   };
 
   const handleDelete = async (id: string) => {
-    await fetch(`http://localhost:5003/api/candidates/${id}`, {
+    await fetch(API_URL + `/api/candidates/${id}`, {
       method: "DELETE",
     });
     fetchCandidates();

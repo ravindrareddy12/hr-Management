@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PageContainer from "../layout/PageContainer";
 import AlertMessage from "../AlertMessage";
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface Candidate {
   candidateName: string;
@@ -50,9 +51,7 @@ const CandidateDetails: React.FC = () => {
 
   const fetchCandidateDetails = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5003/api/candidates/${id}`
-      );
+      const response = await fetch(API_URL + `/api/candidates/${id}`);
       if (!response.ok) throw new Error("Failed to fetch candidate details.");
       const data = await response.json();
       setCandidate(data);
@@ -129,15 +128,21 @@ const CandidateDetails: React.FC = () => {
               </p>
               <p>
                 <strong>Date of Requirement:</strong>{" "}
-                {new Date(candidate.dateOfRequirement).toLocaleDateString(
-                  "en-GB"
-                )}
+                {candidate.dateOfRequirement &&
+                new Date(candidate.dateOfRequirement).getTime() !== 0
+                  ? new Date(candidate.dateOfRequirement).toLocaleDateString(
+                      "en-GB"
+                    )
+                  : ""}
               </p>
               <p>
                 <strong>Date of Submission:</strong>{" "}
-                {new Date(candidate.dateOfSubmission).toLocaleDateString(
-                  "en-GB"
-                )}
+                {candidate.dateOfSubmission &&
+                new Date(candidate.dateOfSubmission).getTime() !== 0
+                  ? new Date(candidate.dateOfSubmission).toLocaleDateString(
+                      "en-GB"
+                    )
+                  : ""}
               </p>
             </div>
 

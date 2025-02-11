@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import PageContainer from "../layout/PageContainer";
 import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface FormData {
   [key: string]: string | null;
@@ -51,7 +52,7 @@ const RecruitmentForm: React.FC = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`http://localhost:5003/api/candidates/${id}`)
+        .get(API_URL + `/api/candidates/${id}`)
         .then((response) => {
           const data = response.data;
           const formattedData = {
@@ -99,8 +100,8 @@ const RecruitmentForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = id
-      ? `http://localhost:5003/api/candidates/${id}`
-      : "http://localhost:5003/api/candidates";
+      ? API_URL + `/api/candidates/${id}`
+      : API_URL + "/api/candidates";
 
     try {
       if (id) {

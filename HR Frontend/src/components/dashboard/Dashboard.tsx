@@ -5,6 +5,7 @@ import Charts from "./Charts";
 import RecentCandidates from "./RecentCandidates";
 import axios from "axios";
 import { fetchCandidateStatistics } from "./service";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Define types
 interface Candidate {
@@ -27,20 +28,21 @@ const Dashboard: React.FC = () => {
 
   // Fetch recent candidates
   useEffect(() => {
-    const fetchCandidates = async () => {
-      try {
-        const response = await axios.get<Candidate[]>(
-          "http://localhost:5003/api/candidates/recent/limit"
-        );
-        setRecentCandidates(response.data);
-      } catch (err) {
-        setError("Failed to fetch candidates");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchCandidates();
   }, []);
+
+  const fetchCandidates = async () => {
+    try {
+      const response = await axios.get<Candidate[]>(
+        API_URL + "/api/candidates/recent/limit"
+      );
+      setRecentCandidates(response.data);
+    } catch (err) {
+      setError("Failed to fetch candidates");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch statistics
   useEffect(() => {
@@ -71,6 +73,7 @@ const Dashboard: React.FC = () => {
         />
         <Charts />
         <RecentCandidates
+          fetchCandidates={fetchCandidates}
           candidates={recentCandidates}
           loading={loading}
           error={error}
