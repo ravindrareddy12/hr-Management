@@ -21,7 +21,7 @@ const app = express();
 // Enable CORS with credentials
 app.use(cors({
   credentials: true,
-  origin: "https://eclectic-gaufre-b3d6e1.netlify.app", // Ensure this matches your frontend URL
+  origin: "https://sq-hiring-tool.netlify.app", // Ensure this matches your frontend URL
 }));
 
 
