@@ -13,11 +13,7 @@ const Statistics = ({ stats }) => {
       value: stats.totalCandidates,
       icon: <FaUsers size={30} className="text-blue-800" />,
     },
-    {
-      title: "Active Positions",
-      value: stats.activePositions,
-      icon: <FaBriefcase size={30} className="text-blue-800" />,
-    },
+
     {
       title: "Offers Made",
       value: stats.offersMade,
@@ -31,7 +27,7 @@ const Statistics = ({ stats }) => {
   ];
 
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-3 gap-4">
       {statistics.map((stat, index) => (
         <div
           key={index}

@@ -13,18 +13,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { fetchCandidateStatistics } from "./service";
 
 const COLORS = ["#1E3A8A", "#10B981", "#F59E0B"];
 
-const applicationData = [
-  { date: "Jan 1", applications: 5 },
-  { date: "Jan 5", applications: 12 },
-  { date: "Jan 10", applications: 18 },
-  { date: "Jan 15", applications: 25 },
-  { date: "Jan 20", applications: 32 },
-  { date: "Jan 25", applications: 45 },
-  { date: "Jan 30", applications: 50 },
-];
+// const applicationData = [
+//   { month: "Jan ", applications: 5 },
+//   { month: "Feb", applications: 12 },
+//   { month: "mar", applications: 18 },
+// ];
 
 const renderCustomLabel = ({
   cx,
@@ -56,18 +53,29 @@ const renderCustomLabel = ({
 
 const Charts = () => {
   const [data, setData] = useState([]);
+  const [timelineData, setTimelineData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/candidates/statistics/st`
-        );
-        setData([
-          { name: "Total Candidates", value: response.data.totalCandidates },
-          { name: "Offers Made", value: response.data.offersMade },
-          { name: "Candidates Joined", value: response.data.candidatesJoined },
-        ]);
+        const stats = await fetchCandidateStatistics();
+        console.log(stats, "stats");
+
+        setData(stats);
+
+        const monthlyData =
+          stats.find((st) => st.name === "monthlyData")?.value || [];
+
+        if (Array.isArray(monthlyData)) {
+          const formattedData = monthlyData.map(({ month, applications }) => ({
+            date: month, // Correct field mapping
+            applications,
+          }));
+          console.log(formattedData, "formattedData");
+          setTimelineData(formattedData);
+        } else {
+          console.error("Invalid format for monthlyData", monthlyData);
+        }
       } catch (error) {
         console.error("Error fetching candidate statistics:", error);
       }
@@ -115,7 +123,12 @@ const Charts = () => {
           Application Timeline
         </h3>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={applicationData}>
+          <LineChart
+            data={[
+              { date: "Jan 1", applications: 5 },
+              { date: "Jan 5", applications: 12 },
+            ]}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
             <YAxis />
