@@ -17,12 +17,6 @@ import { fetchCandidateStatistics } from "./service";
 
 const COLORS = ["#1E3A8A", "#10B981", "#F59E0B"];
 
-// const applicationData = [
-//   { month: "Jan ", applications: 5 },
-//   { month: "Feb", applications: 12 },
-//   { month: "mar", applications: 18 },
-// ];
-
 const renderCustomLabel = ({
   cx,
   cy,
@@ -61,7 +55,7 @@ const Charts = () => {
         const stats = await fetchCandidateStatistics();
         console.log(stats, "stats");
 
-        setData(stats);
+        // setData(stats);
 
         const monthlyData =
           stats.find((st) => st.name === "monthlyData")?.value || [];
@@ -123,14 +117,9 @@ const Charts = () => {
           Application Timeline
         </h3>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart
-            data={[
-              { date: "Jan 1", applications: 5 },
-              { date: "Jan 5", applications: 12 },
-            ]}
-          >
+          <LineChart data={timelineData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
+            <XAxis dataKey="month" />
             <YAxis />
             <Tooltip />
             <Line
