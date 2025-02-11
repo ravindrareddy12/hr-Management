@@ -9,7 +9,8 @@ router.post("/", candidateController.createCandidate);
 router.put("/:id", candidateController.updateCandidate);
 router.delete("/:id", candidateController.deleteCandidate);
 router.get("/recent/limit", candidateController.getRecentCandidates);
-router.get("/statistics", async (req, res) => {
+router.get("/statistics/st", async (req, res) => {
+    console.log("inside statistics")
     try {
       const totalCandidates = await Candidate.countDocuments();
       const offersMade = await Candidate.countDocuments({
@@ -25,6 +26,7 @@ router.get("/statistics", async (req, res) => {
         offersMade,
         candidatesJoined,
       });
+
 
     } catch (err) {
         console.log(err)
