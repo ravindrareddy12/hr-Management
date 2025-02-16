@@ -1,10 +1,8 @@
 const mongoose = require("mongoose");
 
-const DropdownSchema = new mongoose.Schema({
-  name: { type: String, required: true }, // Dropdown identifier
-  placeholder: { type: String, required: true }, // Placeholder text
-  options: [{ type: String, required: true }], // List of dropdown options
+const dropdownSchema = new mongoose.Schema({
+  field: { type: String, required: true, unique: true },
+  options: { type: [String], required: true, default: [] },
 });
 
-const Dropdown = mongoose.model("Dropdown", DropdownSchema);
-module.exports = Dropdown;
+module.exports = mongoose.model("Dropdown", dropdownSchema);

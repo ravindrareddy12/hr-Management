@@ -1,61 +1,41 @@
 const Dropdown = require("../models/Dropdown");
 
-// Create Dropdown
-exports.createDropdown = async (req, res) => {
-  try {
-    const { name, placeholder, options } = req.body;
-    const newDropdown = new Dropdown({ name, placeholder, options });
-    await newDropdown.save();
-    res.status(201).json(newDropdown);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Get All Dropdowns
+// Fetch all dropdowns
 exports.getDropdowns = async (req, res) => {
   try {
     const dropdowns = await Dropdown.find();
-    res.status(200).json(dropdowns);
+    const formattedData = dropdowns.reduce((acc, dropdown) => {
+      acc[dropdown.field] = dropdown.options;
+      return acc;
+    }, {});
+    
+    res.json(formattedData);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error fetching dropdowns", error });
   }
 };
 
-// Get Single Dropdown
-exports.getDropdown = async (req, res) => {
-  try {
-    const dropdown = await Dropdown.findById(req.params.id);
-    if (!dropdown) return res.status(404).json({ message: "Dropdown not found" });
-    res.status(200).json(dropdown);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Update Dropdown
+// Add or update a dropdown
 exports.updateDropdown = async (req, res) => {
   try {
-    const { name, placeholder, options } = req.body;
-    const updatedDropdown = await Dropdown.findByIdAndUpdate(
-      req.params.id,
-      { name, placeholder, options },
-      { new: true }
-    );
-    if (!updatedDropdown) return res.status(404).json({ message: "Dropdown not found" });
-    res.status(200).json(updatedDropdown);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+    const { field, options } = req.body;
 
-// Delete Dropdown
-exports.deleteDropdown = async (req, res) => {
-  try {
-    const deletedDropdown = await Dropdown.findByIdAndDelete(req.params.id);
-    if (!deletedDropdown) return res.status(404).json({ message: "Dropdown not found" });
-    res.status(200).json({ message: "Dropdown deleted successfully" });
+    if (!field || !Array.isArray(options)) {
+      return res.status(400).json({ message: "Invalid data format" });
+    }
+
+    let dropdown = await Dropdown.findOne({ field });
+
+    if (dropdown) {
+      dropdown.options = options;
+      await dropdown.save();
+    } else {
+      dropdown = new Dropdown({ field, options });
+      await dropdown.save();
+    }
+
+    res.json({ message: `Dropdown '${field}' updated successfully`, dropdown });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error updating dropdown", error });
   }
 };
