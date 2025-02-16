@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx"; // Correct import
-import AlertMessage from "../AlertMessage";
 import PageContainer from "../layout/PageContainer";
 import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
+import AlertMessages from "../AlertMessage";
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface Candidate {
@@ -53,6 +53,9 @@ const Candidates: React.FC = () => {
   const [dateRange, setDateRange] = useState<string>("");
   const navigate = useNavigate();
   const { user } = useAuth(); // Get the logged-in user
+  const [alert, setAlert] = useState<{ message: string; type: any } | null>(
+    null
+  );
 
   useEffect(() => {
     fetchCandidates();
@@ -74,6 +77,7 @@ const Candidates: React.FC = () => {
       method: "DELETE",
     });
     fetchCandidates();
+    setAlert({ message: "Candidate deleted successfully!", type: "error" });
   };
 
   const handleEdit = (id: string) => {
@@ -258,11 +262,11 @@ const Candidates: React.FC = () => {
       description="Manage and view all candidates."
     >
       <div>
-        {errorMessage && (
-          <AlertMessage
-            message={errorMessage}
-            onClose={() => setErrorMessage("")}
-            type={"info"}
+        {alert && (
+          <AlertMessages
+            message={alert.message}
+            type={alert.type}
+            onClose={() => setAlert(null)}
           />
         )}
 

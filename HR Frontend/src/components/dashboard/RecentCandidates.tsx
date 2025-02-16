@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import AlertMessages from "../AlertMessage";
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface Candidate {
@@ -41,16 +42,21 @@ const RecentCandidates: React.FC<RecentCandidatesProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [alert, setAlert] = useState<{ message: string; type: any } | null>(
+    null
+  );
 
   const handleDelete = async (id: string) => {
     await fetch(API_URL + `/api/candidates/${id}`, {
       method: "DELETE",
     });
     fetchCandidates();
+    setAlert({ message: "Candidate deleted successfully!", type: "error" });
   };
 
   const handleEdit = (id: string) => {
     navigate(`/recruitmentForm/${id}`);
+    setAlert({ message: "Candidate edited successfully!", type: "info" });
   };
 
   const handleView = (id: string) => {
@@ -59,6 +65,13 @@ const RecentCandidates: React.FC<RecentCandidatesProps> = ({
 
   return (
     <div className="bg-white p-4 rounded shadow overflow-x-auto">
+      {alert && (
+        <AlertMessages
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+        />
+      )}
       <h3 className="text-xl font-bold mb-4">Recent Candidates</h3>
       {loading ? (
         <p>Loading...</p>

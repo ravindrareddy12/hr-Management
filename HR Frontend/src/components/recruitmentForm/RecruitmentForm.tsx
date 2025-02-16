@@ -4,6 +4,7 @@ import axios from "axios";
 import PageContainer from "../layout/PageContainer";
 import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
 const API_URL = import.meta.env.VITE_API_URL;
+import AlertMessage from "../AlertMessage";
 
 interface FormData {
   [key: string]: string | null;
@@ -17,7 +18,11 @@ const RecruitmentForm: React.FC = () => {
   const { user } = useAuth(); // Get the logged-in user
   const { id } = useParams();
   const navigate = useNavigate();
-  const [dropdowns, setDropdowns] = useState([]);
+  const [unmatchedFields, setUnmatchedFields] = useState<string[]>([]);
+  const [alert, setAlert] = useState<{ message: string; type: any } | null>(
+    null
+  );
+
   const [dropdownOptions, setDropdownOptions] = useState<DropdownOptions>({});
   const [formData, setFormData] = useState<FormData>({
     tlName: "",
@@ -55,11 +60,26 @@ const RecruitmentForm: React.FC = () => {
 
   // Fetch dropdown options
   useEffect(() => {
-    axios.get(import.meta.env.VITE_API_URL+"/api/dropdowns")
-      .then(response => setDropdowns(response.data))
-      .catch(error => console.error(error));
-  }, []);
+    axios
+      .get(`${API_URL}/api/dropdowns`)
+      .then((response) => {
+        const options = {};
+        const unmatched = [];
 
+        response.data.forEach((dropdown) => {
+          if (formData.hasOwnProperty(dropdown.name)) {
+            options[dropdown.name] = dropdown.options;
+          } else {
+            unmatched.push(dropdown.name); // Track unmatched fields
+            options[dropdown.name] = dropdown.options; // Ensure options are available for unmatched fields
+          }
+        });
+
+        setDropdownOptions(options);
+        setUnmatchedFields(unmatched);
+      })
+      .catch((error) => console.error(error));
+  }, [formData]); // Ensure formData changes trigger the effect
 
   // Fetch candidate data if editing
   useEffect(() => {
@@ -119,19 +139,32 @@ const RecruitmentForm: React.FC = () => {
     try {
       if (id) {
         await axios.put(url, formData);
+        setAlert({
+          message: "Candidate updated successfully!",
+          type: "success",
+        });
       } else {
         await axios.post(url, formData);
+        setAlert({ message: "Candidate added successfully!", type: "info" });
       }
-      navigate("/candidates");
+
+      // Keep alert visible for 5 seconds before navigating
+      setTimeout(() => {
+        setAlert(null);
+        navigate("/candidates");
+      }, 1000); // Wait 5 seconds before navigating
     } catch (err) {
       console.error("Error saving candidate data:", err);
-      setError("Failed to save candidate data.");
+      setAlert({ message: "Failed to save candidate data.", type: "error" });
+
+      // Hide error message after 5 seconds
+      setTimeout(() => setAlert(null), 1000);
     }
   };
+
   const handleNavigateToDropdownManager = () => {
     navigate("/dropdownManager"); // Navigate to the DropdownManager page
   };
-
   return (
     <PageContainer title={id ? "Edit Candidate" : "New Candidate"}>
       <button
@@ -141,6 +174,13 @@ const RecruitmentForm: React.FC = () => {
         Dropdown Manager
       </button>
       <div className="bg-gray-100 min-h-screen">
+        {alert && (
+          <AlertMessage
+            message={alert.message}
+            type={alert.type}
+            onClose={() => setAlert(null)}
+          />
+        )}
         {error && <div className="text-red-600 mb-4">{error}</div>}
         <form className="bg-white p-6 rounded-lg" onSubmit={handleSubmit}>
           {/* TL Name */}
@@ -724,12 +764,37 @@ const RecruitmentForm: React.FC = () => {
               />
             </div>
           </div>
+          {/* Unmatched Fields */}
+          <div className="grid grid-cols-3 gap-4 mt-7">
+            {unmatchedFields.map((field) => (
+              <div key={field}>
+                <label
+                  className="block text-sm font-medium text-gray-800"
+                  htmlFor={field}
+                >
+                  {field}
+                </label>
+                <select
+                  name={field}
+                  value={formData[field] || ""}
+                  onChange={handleChange}
+                  className="input border p-2 rounded w-full bg-gray-200"
+                >
+                  <option value="">Select {field}</option>
+                  {dropdownOptions[field]?.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
 
           {/* Submit Button */}
           <div className="pt-5">
             <button
               type="submit"
-              // className="bg-gray-400 text-blue-800 px-4 py-2 rounded hover:bg-gray-100 sm:w-40 md:w-40"
               className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-blue-800 hover:text-white sm:w-40 md:w-40"
             >
               {id ? "Update Candidate" : "Add Candidate"}
@@ -737,21 +802,6 @@ const RecruitmentForm: React.FC = () => {
           </div>
         </form>
       </div>
-
-
-      <div className="p-4">
-      {dropdowns.map((dropdown) => (
-        <div key={dropdown._id} className="mb-4">
-          <label className="block text-gray-700">{dropdown.name}</label>
-          <select className="border p-2 w-full">
-            <option>{dropdown.placeholder}</option>
-            {dropdown.options.map((option, index) => (
-              <option key={index} value={option}>{option}</option>
-            ))}
-          </select>
-        </div>
-      ))}
-    </div>
     </PageContainer>
   );
 };

@@ -8,7 +8,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [showAlert, setShowAlert] = useState(false); // State to control alert visibility
+  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
@@ -20,10 +20,21 @@ const Login = () => {
         { email, password },
         { withCredentials: true }
       );
+
       if (res.status === 200) {
         setUser(res.data.user);
         localStorage.setItem("userName", res.data.user.username);
-        navigate("/dashboard");
+
+        // ✅ Store success alert before navigation
+        localStorage.setItem(
+          "alertMessage",
+          JSON.stringify({
+            message: "Login successful! Redirecting...",
+            type: "success",
+          })
+        );
+
+        navigate("/dashboard"); // 🚀 Navigate immediately
       }
     } catch (err: any) {
       const errorMsg = err.response?.data?.message || "An error occurred";
@@ -34,7 +45,7 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      {/* Show alert if there's an error */}
+      {/* Show alert for errors */}
       {showAlert && error && (
         <AlertMessages
           message={error}
