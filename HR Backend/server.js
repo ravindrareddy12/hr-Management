@@ -8,8 +8,11 @@ const cors = require('cors');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const candidateRoutes = require('./routes/candidateRoutes');
-const dropdownRoutes = require("./routes/dropdownRoutes");
+// const dropdownRoutes = require("./routes/dropdownRoutes");
 const userRoutes = require("./routes/userRoutes");
+
+
+const dropdownRoutes = require("./routes/dropdownRoutes");
 // Load environment variables
 dotenv.config();
 
@@ -21,7 +24,7 @@ const app = express();
 // Enable CORS with credentials
 app.use(cors({
   credentials: true,
-  origin: "https://sq-hiring-tool.netlify.app", // Ensure this matches your frontend URL
+  origin: "http://127.0.0.1:3000", // Ensure this matches your frontend URL
 }));
 
 
@@ -54,6 +57,7 @@ app.use(session({
 app.use('/api/auth', authRoutes);
 app.use('/api/candidates', candidateRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/dropdowns", dropdownRoutes);
 // Start the servercr
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
