@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Candidates from "./candidate/candidates";
 import RecruitmentForm from "./recruitmentForm/RecruitmentForm";
 import Dashboard from "./dashboard/Dashboard";
-import DropdownsManager from "./recruitmentForm/DropdownsManager";
+import DropdownManager from "./recruitmentForm/DropdownManager";
 import Login from "./auth/Login";
 import Users from "./auth/Users";
 import CandidateDetails from "./candidate/CandidateDetails";
@@ -65,8 +65,8 @@ const RoutesComponent: React.FC = () => {
                     element={<RecruitmentForm />}
                   />
                   <Route
-                    path="/dropdownsManager"
-                    element={<DropdownsManager />}
+                    path="/dropdownManager"
+                    element={<DropdownManager />}
                   />
 
                   {/* Restrict /users route for team members */}
