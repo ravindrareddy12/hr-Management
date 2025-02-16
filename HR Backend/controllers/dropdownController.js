@@ -1,41 +1,61 @@
-const Dropdown = require("../models/Dropdown");
+const Dropdown = require("../models/dropdownModel");
 
-// Fetch all dropdowns
-exports.getDropdowns = async (req, res) => {
+// Create Dropdown
+exports.createDropdown = async (req, res) => {
   try {
-    const dropdowns = await Dropdown.find();
-    const formattedData = dropdowns.reduce((acc, dropdown) => {
-      acc[dropdown.field] = dropdown.options;
-      return acc;
-    }, {});
-    
-    res.json(formattedData);
+    const { name, placeholder, options } = req.body;
+    const newDropdown = new Dropdown({ name, placeholder, options });
+    await newDropdown.save();
+    res.status(201).json(newDropdown);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching dropdowns", error });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// Add or update a dropdown
+// Get All Dropdowns
+exports.getDropdowns = async (req, res) => {
+  try {
+    const dropdowns = await Dropdown.find();
+    res.status(200).json(dropdowns);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get Single Dropdown
+exports.getDropdown = async (req, res) => {
+  try {
+    const dropdown = await Dropdown.findById(req.params.id);
+    if (!dropdown) return res.status(404).json({ message: "Dropdown not found" });
+    res.status(200).json(dropdown);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update Dropdown
 exports.updateDropdown = async (req, res) => {
   try {
-    const { field, options } = req.body;
-
-    if (!field || !Array.isArray(options)) {
-      return res.status(400).json({ message: "Invalid data format" });
-    }
-
-    let dropdown = await Dropdown.findOne({ field });
-
-    if (dropdown) {
-      dropdown.options = options;
-      await dropdown.save();
-    } else {
-      dropdown = new Dropdown({ field, options });
-      await dropdown.save();
-    }
-
-    res.json({ message: `Dropdown '${field}' updated successfully`, dropdown });
+    const { name, placeholder, options } = req.body;
+    const updatedDropdown = await Dropdown.findByIdAndUpdate(
+      req.params.id,
+      { name, placeholder, options },
+      { new: true }
+    );
+    if (!updatedDropdown) return res.status(404).json({ message: "Dropdown not found" });
+    res.status(200).json(updatedDropdown);
   } catch (error) {
-    res.status(500).json({ message: "Error updating dropdown", error });
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete Dropdown
+exports.deleteDropdown = async (req, res) => {
+  try {
+    const deletedDropdown = await Dropdown.findByIdAndDelete(req.params.id);
+    if (!deletedDropdown) return res.status(404).json({ message: "Dropdown not found" });
+    res.status(200).json({ message: "Dropdown deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

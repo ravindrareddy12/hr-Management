@@ -17,6 +17,7 @@ const RecruitmentForm: React.FC = () => {
   const { user } = useAuth(); // Get the logged-in user
   const { id } = useParams();
   const navigate = useNavigate();
+  const [dropdowns, setDropdowns] = useState([]);
   const [dropdownOptions, setDropdownOptions] = useState<DropdownOptions>({});
   const [formData, setFormData] = useState<FormData>({
     tlName: "",
@@ -54,38 +55,11 @@ const RecruitmentForm: React.FC = () => {
 
   // Fetch dropdown options
   useEffect(() => {
-    const fetchDropdownOptions = async () => {
-      const fields = [
-        "tlName",
-        "taName",
-        "am",
-        "client",
-        "location",
-        "nationality",
-        "workStatus",
-        "noticePeriod",
-        "workMode",
-        "internalInterviewStatus",
-        "clientInterviewStatus",
-        "offerStatus",
-        "epRequest",
-      ];
-
-      const options: DropdownOptions = {};
-      for (const field of fields) {
-        try {
-          const response = await axios.get(`${API_URL}/api/dropdowns/${field}`);
-          options[field] = response.data;
-        } catch (err) {
-          console.error(`Error fetching ${field} options:`, err);
-          options[field] = [];
-        }
-      }
-      setDropdownOptions(options);
-    };
-
-    fetchDropdownOptions();
+    axios.get(import.meta.env.VITE_API_URL+"/api/dropdowns")
+      .then(response => setDropdowns(response.data))
+      .catch(error => console.error(error));
   }, []);
+
 
   // Fetch candidate data if editing
   useEffect(() => {
@@ -763,6 +737,21 @@ const RecruitmentForm: React.FC = () => {
           </div>
         </form>
       </div>
+
+
+      <div className="p-4">
+      {dropdowns.map((dropdown) => (
+        <div key={dropdown._id} className="mb-4">
+          <label className="block text-gray-700">{dropdown.name}</label>
+          <select className="border p-2 w-full">
+            <option>{dropdown.placeholder}</option>
+            {dropdown.options.map((option, index) => (
+              <option key={index} value={option}>{option}</option>
+            ))}
+          </select>
+        </div>
+      ))}
+    </div>
     </PageContainer>
   );
 };

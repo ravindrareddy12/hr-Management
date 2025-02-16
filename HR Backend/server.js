@@ -9,10 +9,11 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const candidateRoutes = require('./routes/candidateRoutes');
 // const dropdownRoutes = require("./routes/dropdownRoutes");
+const dropdownRoutes = require("./routes/dropdownRoutes");
 const userRoutes = require("./routes/userRoutes");
 
 
-const dropdownRoutes = require("./routes/dropdownRoutes");
+
 // Load environment variables
 dotenv.config();
 
@@ -33,7 +34,6 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cookieParser());
-app.use("/api", dropdownRoutes);
 
 
 // Configure sessions

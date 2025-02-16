@@ -11,7 +11,7 @@ const AddDropdown = () => {
   // Fetch dropdowns
   const fetchDropdowns = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5003/api/dropdowns/ss");
+      const response = await axios.get(import.meta.env.VITE_API_URL+"/api/dropdowns");
       setDropdowns(response.data);
     } catch (error) {
       console.error("Error fetching dropdowns:", error);
@@ -30,13 +30,13 @@ const AddDropdown = () => {
     try {
       if (editingId) {
         // Update existing dropdown
-        await axios.put(`http://127.0.0.1:5003/api/dropdowns/${editingId}`, {
+        await axios.put(import.meta.env.VITE_API_URL+`/api/dropdowns/${editingId}`, {
           name, placeholder, options: optionsArray
         });
         setEditingId(null);
       } else {
         // Create new dropdown
-        await axios.post("http://127.0.0.1:5003/api/dropdowns", {
+        await axios.post(import.meta.env.VITE_API_URL+"/api/dropdowns", {
           name, placeholder, options: optionsArray
         });
       }
@@ -61,7 +61,7 @@ const AddDropdown = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this dropdown?")) {
       try {
-        await axios.delete(`http://127.0.0.1:5003/api/dropdowns/${id}`);
+        await axios.delete(import.meta.env.VITE_API_URL+`/api/dropdowns/${id}`);
         fetchDropdowns();
       } catch (error) {
         console.error("Error deleting dropdown:", error);
