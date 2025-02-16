@@ -11,7 +11,9 @@ const AddDropdown = () => {
   // Fetch dropdowns
   const fetchDropdowns = async () => {
     try {
-      const response = await axios.get(import.meta.env.VITE_API_URL+"/api/dropdowns");
+      const response = await axios.get(
+        import.meta.env.VITE_API_URL + "/api/dropdowns"
+      );
       setDropdowns(response.data);
     } catch (error) {
       console.error("Error fetching dropdowns:", error);
@@ -25,19 +27,26 @@ const AddDropdown = () => {
   // Handle form submission (Create & Update)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const optionsArray = options.split(",").map(opt => opt.trim());
+    const optionsArray = options.split(",").map((opt) => opt.trim());
 
     try {
       if (editingId) {
         // Update existing dropdown
-        await axios.put(import.meta.env.VITE_API_URL+`/api/dropdowns/${editingId}`, {
-          name, placeholder, options: optionsArray
-        });
+        await axios.put(
+          import.meta.env.VITE_API_URL + `/api/dropdowns/${editingId}`,
+          {
+            name,
+            placeholder,
+            options: optionsArray,
+          }
+        );
         setEditingId(null);
       } else {
         // Create new dropdown
-        await axios.post(import.meta.env.VITE_API_URL+"/api/dropdowns", {
-          name, placeholder, options: optionsArray
+        await axios.post(import.meta.env.VITE_API_URL + "/api/dropdowns", {
+          name,
+          placeholder,
+          options: optionsArray,
         });
       }
       setName("");
@@ -61,7 +70,9 @@ const AddDropdown = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this dropdown?")) {
       try {
-        await axios.delete(import.meta.env.VITE_API_URL+`/api/dropdowns/${id}`);
+        await axios.delete(
+          import.meta.env.VITE_API_URL + `/api/dropdowns/${id}`
+        );
         fetchDropdowns();
       } catch (error) {
         console.error("Error deleting dropdown:", error);
@@ -72,7 +83,9 @@ const AddDropdown = () => {
   return (
     <div className="p-4">
       {/* Form to Add/Edit Dropdown */}
-      <h2 className="text-xl font-bold mb-4">{editingId ? "Edit Dropdown" : "Add Dropdown"}</h2>
+      <h2 className="text-xl font-bold mb-4">
+        {editingId ? "Edit Dropdown" : "Add Dropdown"}
+      </h2>
       <form onSubmit={handleSubmit} className="mb-6 space-y-4">
         <input
           type="text"
@@ -98,7 +111,10 @@ const AddDropdown = () => {
           className="border p-2 w-full"
           required
         />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-2 rounded w-full"
+        >
           {editingId ? "Update Dropdown" : "Add Dropdown"}
         </button>
       </form>
@@ -110,9 +126,12 @@ const AddDropdown = () => {
       ) : (
         <ul className="space-y-4">
           {dropdowns.map((dropdown) => (
-            <li key={dropdown._id} className="border p-4 rounded flex justify-between items-center">
+            <li
+              key={dropdown._id}
+              className="border p-4 rounded flex justify-between items-center"
+            >
               <div>
-                <strong>{dropdown.name}</strong> ({dropdown.placeholder})  
+                <strong>{dropdown.name}</strong> ({dropdown.placeholder})
                 <ul className="text-sm text-gray-600">
                   {dropdown.options.map((option, index) => (
                     <li key={index}>- {option}</li>

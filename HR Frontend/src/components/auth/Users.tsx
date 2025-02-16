@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PageContainer from "../layout/PageContainer";
 import AlertMessages from "../AlertMessage";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Users: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const Users: React.FC = () => {
     role: "team-member",
     teamLeader: "",
   });
+  const { user } = useAuth();
 
   const [users, setUsers] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -20,13 +22,13 @@ const Users: React.FC = () => {
     show: false,
   });
 
-  // Function to trigger the alert
   const showAlert = (
     message: string,
     type: "success" | "error" | "info" | "warning" | "dark"
   ) => {
     setAlert({ message, type, show: true });
   };
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -38,7 +40,7 @@ const Users: React.FC = () => {
       });
       setUsers(res.data);
     } catch (err) {
-      showAlert("Error fetching users");
+      showAlert("Error fetching users", "error");
     }
   };
 
@@ -66,12 +68,7 @@ const Users: React.FC = () => {
         formData,
         { withCredentials: true }
       );
-      showAlert(
-        `${
-          formData.role === "team-leader" ? "Team Leader" : "Team Member"
-        } created successfully!`,
-        "success"
-      );
+      showAlert(`${formData.role} created successfully!`, "success");
       setFormData({
         username: "",
         email: "",
@@ -85,7 +82,17 @@ const Users: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, _role: string) => {
+    if (user?.role !== "admin") {
+      showAlert("Only admins can delete users!", "error");
+      return;
+    }
+
+    if (user?.id === user?.id) {
+      showAlert("Admins cannot delete themselves!", "error");
+      return;
+    }
+
     try {
       await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
         withCredentials: true,
@@ -112,8 +119,7 @@ const Users: React.FC = () => {
       <div className="flex flex-wrap gap-6 p-8">
         <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md border-2 border-gray-400">
           <h3 className="text-xl font-semibold text-gray-800 mb-4">
-            Create{" "}
-            {formData.role === "team-leader" ? "Team Leader" : "Team Member"}
+            Create {formData.role}
           </h3>
           {error && <p className="text-red-600 mb-4">{error}</p>}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -123,6 +129,7 @@ const Users: React.FC = () => {
               onChange={handleChange}
               className="w-full px-4 py-2 bg-gray-200 border rounded-lg"
             >
+              <option value="admin">Admin</option>
               <option value="team-leader">Team Leader</option>
               <option value="team-member">Team Member</option>
             </select>
@@ -175,8 +182,7 @@ const Users: React.FC = () => {
               type="submit"
               className="w-full px-4 py-2 text-white bg-gray-800 rounded-lg hover:bg-blue-800"
             >
-              Create{" "}
-              {formData.role === "team-leader" ? "Team Leader" : "Team Member"}
+              Create {formData.role}
             </button>
           </form>
         </div>
@@ -200,8 +206,8 @@ const Users: React.FC = () => {
                     <td className="px-4 py-3 truncate">{user.role}</td>
                     <td className="px-4 py-3">
                       <button
-                        onClick={() => handleDelete(user._id)}
-                        className="text-red-600 hover:text-white bg-transparent hover:bg-red-600 px-3 py-1 rounded"
+                        onClick={() => handleDelete(user._id, user.role)}
+                        className="text-red-600  px-3 py-1 rounded  hover:text-blue-800"
                       >
                         Delete
                       </button>
