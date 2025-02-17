@@ -138,13 +138,17 @@ const RecruitmentForm: React.FC = () => {
 
     try {
       if (id) {
-        await axios.put(url, formData);
+        await axios.put(url, formData,{
+          withCredentials:true
+        });
         setAlert({
           message: "Candidate updated successfully!",
           type: "success",
         });
       } else {
-        await axios.post(url, formData);
+        await axios.post(url, formData,{
+          withCredentials:true
+        });
         setAlert({ message: "Candidate added successfully!", type: "info" });
       }
 
