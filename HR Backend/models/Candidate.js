@@ -15,7 +15,7 @@ const candidateSchema = new mongoose.Schema(
     workStatus: String,
     phoneNumber: String,
     email: String,
-    totalYearsOfExperience :String,
+    totalYearsOfExperience: String,
     noticePeriod: String,
     workMode: String,
     currentSalary: String,
@@ -30,7 +30,11 @@ const candidateSchema = new mongoose.Schema(
     offerStatus: String,
     epRequest: String,
     joiningDate: Date,
-    remarks:String,
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    remarks: String,
   },
   { timestamps: true }
 );

@@ -1,15 +1,39 @@
 const Candidate = require("../models/Candidate");
-
+const User = require("../models/User");
 // Get all candidates
 exports.getAllCandidates = async (req, res) => {
   try {
-    const candidates = await Candidate.find();
-    res.json(candidates);
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ error: "Unauthorized: Missing userId" });
+    }
+
+    // Fetch the logged-in user
+    const loggedInUser = await User.findById(req.user.userId);
+    if (!loggedInUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    let candidates;
+
+    if (loggedInUser.role === "team-leader") {
+      // Find all team members where teamLeader is the logged-in user
+      const teamMembers = await User.find({ teamLeader: loggedInUser._id }).select("_id");
+
+      const memberIds = teamMembers.map(member => member._id); // Extract user IDs
+
+      // Fetch candidates where userId is either the team leader or any of their team members
+      candidates = await Candidate.find({ userId: { $in: [loggedInUser._id, ...memberIds] } });
+    } else {
+      // If not a team leader, fetch only their own candidates
+      candidates = await Candidate.find({ userId: loggedInUser._id });
+    }
+
+    res.status(200).json({ success: true, data: candidates });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch candidates" });
+    console.error("Error fetching candidates:", error);
+    res.status(500).json({ error: "Failed to fetch candidates", details: error.message });
   }
 };
-
 // Get a candidate by ID
 exports.getCandidateById = async (req, res) => {
   try {
@@ -24,13 +48,22 @@ exports.getCandidateById = async (req, res) => {
 // Create a new candidate
 exports.createCandidate = async (req, res) => {
   try {
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ error: "Unauthorized: Missing userId" });
+    }
+
+    req.body.userId = req.user.userId;
+
     const newCandidate = new Candidate(req.body);
     const savedCandidate = await newCandidate.save();
+
     res.status(201).json(savedCandidate);
   } catch (error) {
-    res.status(400).json({ error: "Failed to create candidate" });
+    console.error("Error creating candidate:", error); // Logs error for debugging
+    res.status(500).json({ error: "Failed to create candidate", details: error.message });
   }
 };
+
 
 // Update a candidate
 exports.updateCandidate = async (req, res) => {
