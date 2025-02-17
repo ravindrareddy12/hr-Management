@@ -25,7 +25,7 @@ const app = express();
 // Enable CORS with credentials
 app.use(cors({
   credentials: true,
-  origin: "http://127.0.0.1:3000", // Ensure this matches your frontend URL
+  origin: "https://sq-hiring-tool.netlify.app", // Ensure this matches your frontend URL
 }));
 
 
