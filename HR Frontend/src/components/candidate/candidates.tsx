@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx"; // Correct import
 import PageContainer from "../layout/PageContainer";
 import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
 import AlertMessages from "../AlertMessage";
+import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface Candidate {
@@ -66,10 +67,12 @@ const Candidates: React.FC = () => {
   }, [searchTerm, filterStatus, dateRange, candidates]);
 
   const fetchCandidates = async () => {
-    const response = await fetch(API_URL + "/api/candidates");
-    const data = await response.json();
-    setCandidates(data);
-    setFilteredCandidates(data);
+    const response = await axios.get(API_URL + "/api/candidates",{
+      withCredentials:true
+    });
+    console.log(response.data,"response.data");
+    setCandidates(response.data.data);
+    setFilteredCandidates(response.data.data);
   };
 
   const handleDelete = async (id: string) => {
