@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AlertMessages from "../AlertMessage";
 import { useAuth } from "../../contexts/AuthContext";
+import logo from "../../assets/logo.jpg";
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState<string | null>(null);
@@ -57,13 +58,9 @@ const Navbar: React.FC = () => {
       )}
       <div className="fixed top-0 left-0 w-full bg-gray-100 shadow-lg p-4 z-10 flex justify-between items-center">
         <div className="flex items-center">
-          <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-white text-lg font-bold">
-            HR
-          </div>
-          <span className="text-gray-800 text-lg font-semibold ml-2 hover:text-blue-800">
-            HRFlow
-          </span>
+          <img src={logo} alt="Logo" className="h-10 w-auto" />
         </div>
+
         <div className="text-center flex-1">
           <h2 className="text-xl text-gray-800 hover:text-blue-800 font-semibold">
             Hi, {user?.username}

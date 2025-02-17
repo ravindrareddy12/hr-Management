@@ -189,13 +189,15 @@ const CandidateDetails: React.FC = () => {
               </h3>
 
               <p>
-                <strong>Selection Date:</strong> {candidate.selectionDate}
+                <strong>Selection Date:</strong>{" "}
+                {new Date(candidate.selectionDate).toLocaleDateString("en-GB")}
               </p>
               <p>
                 <strong>Salary Offered:</strong> {candidate.salaryOffered}
               </p>
               <p>
-                <strong>Offer Date:</strong> {candidate.offerDate}
+                <strong>Offer Date:</strong>{" "}
+                {new Date(candidate.offerDate).toLocaleDateString("en-GB")}
               </p>
               <p>
                 <strong>Offer Status:</strong> {candidate.offerStatus}
@@ -204,7 +206,8 @@ const CandidateDetails: React.FC = () => {
                 <strong>EP Request:</strong> {candidate.epRequest}
               </p>
               <p>
-                <strong>Joining Date:</strong> {candidate.joiningDate}
+                <strong>Joining Date:</strong>
+                {new Date(candidate.joiningDate).toLocaleDateString("en-GB")}
               </p>
             </div>
             <div>
@@ -213,14 +216,14 @@ const CandidateDetails: React.FC = () => {
               </h3>
 
               <p>
-                <strong>Internal Interview Date:</strong>{" "}
-                {candidate.internalInterviewDate} (
-                {candidate.internalInterviewDate})
+                <strong>Internal Interview Date:</strong>
+                {new Date(candidate.internalInterviewDate).toLocaleDateString(
+                  "en-GB"
+                )}
               </p>
               <p>
-                <strong>Internal Interview Status:</strong>{" "}
-                {candidate.internalInterviewStatus} (
-                {candidate.internalInterviewStatus})
+                <strong>Internal Interview Status:</strong>
+                {candidate.internalInterviewStatus}
               </p>
             </div>
             <div>
@@ -229,14 +232,14 @@ const CandidateDetails: React.FC = () => {
               </h3>
 
               <p>
-                <strong>Client Interview Date:</strong>{" "}
-                {candidate.clientInterviewDate} ({candidate.clientInterviewDate}
-                )
+                <strong>Client Interview Date:</strong>
+                {new Date(candidate.clientInterviewDate).toLocaleDateString(
+                  "en-GB"
+                )}
               </p>
               <p>
-                <strong>Client Interview:</strong>{" "}
-                {candidate.clientInterviewStatus} (
-                {candidate.clientInterviewStatus})
+                <strong>Client Interview:</strong>
+                {candidate.clientInterviewStatus}
               </p>
             </div>
 
