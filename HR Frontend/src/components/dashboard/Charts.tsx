@@ -20,7 +20,9 @@ const COLORS = ["#1E3A8A", "#10B981", "#F59E0B"];
 
 const fetchCandidateStatistics = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/candidates/statistics/st`);
+    const response = await axios.get(`${API_URL}/api/candidates/statistics/st`,{
+      withCredentials:true
+    });
     return [
       { name: "Total Candidates", value: response.data.totalCandidates },
       { name: "Offers Made", value: response.data.offersMade },
