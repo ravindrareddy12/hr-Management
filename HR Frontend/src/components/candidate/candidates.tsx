@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { data, useNavigate } from "react-router-dom";
-import * as XLSX from "xlsx"; // Correct import
+import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
 import PageContainer from "../layout/PageContainer";
-import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
+import { useAuth } from "../../contexts/AuthContext";
 import AlertMessages from "../AlertMessage";
 import axios from "axios";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface Candidate {
@@ -44,35 +47,46 @@ interface Candidate {
 
 const Candidates: React.FC = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string>(""); // State for error message
-
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [filteredCandidates, setFilteredCandidates] = useState<Candidate[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [candidatesPerPage] = useState(8);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const [dateRange, setDateRange] = useState<string>("");
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+  const [startDate, endDate] = dateRange;
   const navigate = useNavigate();
-  const { user } = useAuth(); // Get the logged-in user
+  const { user } = useAuth();
   const [alert, setAlert] = useState<{ message: string; type: any } | null>(
     null
   );
+  const [unmatchedFields, setUnmatchedFields] = useState<string[]>([]);
 
   useEffect(() => {
     fetchCandidates();
-  }, []);
+  }, [user?.role]);
 
   useEffect(() => {
     applyFilters();
   }, [searchTerm, filterStatus, dateRange, candidates]);
 
   const fetchCandidates = async () => {
-    const response = await axios.get(API_URL + "/api/candidates",{
-      withCredentials:true
-    });
-    console.log(response.data,"response.data");
-    setCandidates(response.data.data);
-    setFilteredCandidates(response.data.data);
+    try {
+      const response = await axios.get(API_URL + "/api/candidates", {
+        withCredentials: true,
+        params: {
+          role: user?.role,
+        },
+      });
+      setCandidates(response.data.data);
+      setFilteredCandidates(response.data.data);
+    } catch (error) {
+      console.error("Error fetching candidates:", error);
+      setErrorMessage("Failed to fetch candidates.");
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -86,14 +100,14 @@ const Candidates: React.FC = () => {
   const handleEdit = (id: string) => {
     navigate(`/recruitmentForm/${id}`);
   };
+
   const handleView = (id: string) => {
-    navigate(`/candidateDetails/${id}`); // Redirects to the candidate details page
+    navigate(`/candidateDetails/${id}`);
   };
 
   const applyFilters = () => {
     let filtered = candidates;
 
-    // Filter by name, email, or phone number
     if (searchTerm) {
       filtered = filtered.filter(
         (candidate) =>
@@ -111,13 +125,10 @@ const Candidates: React.FC = () => {
       );
     }
 
-    if (dateRange) {
-      const [start, end] = dateRange.split(" - ").map((date) => date.trim());
+    if (startDate && endDate) {
       filtered = filtered.filter((candidate) => {
         const submissionDate = new Date(candidate.dateOfSubmission);
-        return (
-          submissionDate >= new Date(start) && submissionDate <= new Date(end)
-        );
+        return submissionDate >= startDate && submissionDate <= endDate;
       });
     }
 
@@ -128,16 +139,17 @@ const Candidates: React.FC = () => {
   const resetFilters = () => {
     setSearchTerm("");
     setFilterStatus("");
-    setDateRange("");
+    setDateRange([null, null]);
   };
+
   const exportToExcel = () => {
     if (filteredCandidates.length === 0) {
       setErrorMessage("No data available to export!");
       return;
     }
 
-    // Define all headers based on the API response
-    const headers = [
+    // Get all possible headers including unmatched fields
+    const allHeaders = [
       "TL Name",
       "TA Name",
       "AM",
@@ -169,75 +181,77 @@ const Candidates: React.FC = () => {
       "Remarks",
       "Created At",
       "Updated At",
+      ...unmatchedFields, // Add unmatched fields dynamically
     ];
 
-    // Prepare the data
     const formatDateForExcel = (date) => {
       return date && new Date(date).getTime() !== 0
-        ? new Date(date).toISOString().split("T")[0] // Convert to YYYY-MM-DD
+        ? new Date(date).toISOString().split("T")[0]
         : "";
     };
 
-    const exportData = filteredCandidates.map((candidate) => [
-      candidate.tlName || "",
-      candidate.taName || "",
-      candidate.am || "",
-      candidate.client || "",
-      candidate.position || "",
-      formatDateForExcel(candidate.dateOfRequirement),
-      formatDateForExcel(candidate.dateOfSubmission),
-      candidate.candidateName || "",
-      candidate.location || "",
-      candidate.nationality || "",
-      candidate.workStatus || "",
-      candidate.phoneNumber || "",
-      candidate.email || "",
-      candidate.totalYearsOfExperience || "",
-      candidate.noticePeriod || "",
-      candidate.workMode || "",
-      candidate.currentSalary || "",
-      candidate.expectedSalary || "",
-      formatDateForExcel(candidate.internalInterviewDate),
-      candidate.internalInterviewStatus || "",
-      formatDateForExcel(candidate.clientInterviewDate),
-      candidate.clientInterviewStatus || "",
-      formatDateForExcel(candidate.selectionDate),
-      candidate.salaryOffered || "",
-      formatDateForExcel(candidate.offerDate),
-      candidate.offerStatus || "",
-      candidate.epRequest || "",
-      formatDateForExcel(candidate.joiningDate),
-      candidate.remarks || "",
-      formatDateForExcel(candidate.createdAt),
-      formatDateForExcel(candidate.updatedAt),
-    ]);
+    const exportData = filteredCandidates.map((candidate) => {
+      const baseData = [
+        candidate.tlName || "",
+        candidate.taName || "",
+        candidate.am || "",
+        candidate.client || "",
+        candidate.position || "",
+        formatDateForExcel(candidate.dateOfRequirement),
+        formatDateForExcel(candidate.dateOfSubmission),
+        candidate.candidateName || "",
+        candidate.location || "",
+        candidate.nationality || "",
+        candidate.workStatus || "",
+        candidate.phoneNumber || "",
+        candidate.email || "",
+        candidate.totalYearsOfExperience || "",
+        candidate.noticePeriod || "",
+        candidate.workMode || "",
+        candidate.currentSalary || "",
+        candidate.expectedSalary || "",
+        formatDateForExcel(candidate.internalInterviewDate),
+        candidate.internalInterviewStatus || "",
+        formatDateForExcel(candidate.clientInterviewDate),
+        candidate.clientInterviewStatus || "",
+        formatDateForExcel(candidate.selectionDate),
+        candidate.salaryOffered || "",
+        formatDateForExcel(candidate.offerDate),
+        candidate.offerStatus || "",
+        candidate.epRequest || "",
+        formatDateForExcel(candidate.joiningDate),
+        candidate.remarks || "",
+        formatDateForExcel(candidate.createdAt),
+        formatDateForExcel(candidate.updatedAt),
+      ];
 
-    // Add headers as the first row
-    const finalData = [headers, ...exportData];
+      // Add unmatched fields data
+      const unmatchedData = unmatchedFields.map(
+        (field) => candidate[field] || ""
+      );
+      return [...baseData, ...unmatchedData];
+    });
 
-    // Create worksheet and workbook
+    const finalData = [allHeaders, ...exportData];
+
     const ws = XLSX.utils.aoa_to_sheet(finalData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "All Candidates Data");
 
-    // Apply styles to the headers
     const headerStyle = {
-      font: { bold: true, color: { rgb: "FFFFFF" } }, // White font color
-      fill: { fgColor: { rgb: "007ACC" } }, // Blue background
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "007ACC" } },
       alignment: { horizontal: "center" },
     };
 
-    // Apply styles only to header row
     const range = XLSX.utils.decode_range(ws["!ref"] || "");
     for (let col = range.s.c; col <= range.e.c; col++) {
-      const cell = ws[XLSX.utils.encode_cell({ r: 0, c: col })];
-      if (cell) {
-        cell.s = headerStyle; // Apply headerStyle to each header cell
-      }
+      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+      if (!ws[cellAddress]) ws[cellAddress] = {};
+      ws[cellAddress].s = headerStyle;
     }
 
-    // Auto-fit columns for better readability
-    const maxColWidths = headers.map((header, i) =>
+    const maxColWidths = allHeaders.map((header, i) =>
       Math.max(
         header.length,
         ...exportData.map((row) => (row[i] ? row[i].toString().length : 0))
@@ -246,10 +260,8 @@ const Candidates: React.FC = () => {
 
     ws["!cols"] = maxColWidths.map((width) => ({ wch: width + 5 }));
 
-    // Trigger download
     XLSX.writeFile(wb, "Candidates_Report.xlsx");
   };
-
   const indexOfLastCandidate = currentPage * candidatesPerPage;
   const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
   const currentCandidates = filteredCandidates.slice(
@@ -280,6 +292,18 @@ const Candidates: React.FC = () => {
               placeholder="Search ..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              className="border border-gray-300 p-2 rounded w-70 sm:w-70 md:w-70"
+            />
+
+            <DatePicker
+              selectsRange={true}
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(update) => {
+                setDateRange(update);
+              }}
+              isClearable={true}
+              placeholderText="Select Date Range"
               className="border border-gray-300 p-2 rounded w-70 sm:w-70 md:w-70"
             />
             <select

@@ -5,6 +5,10 @@ import {
   FaUserLock,
   FaArrowLeft,
   FaArrowRight,
+  FaChartPie,
+  FaThLarge,
+  FaUserTie,
+  FaUsersCog,
 } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
 import PageContainer from "./PageContainer";
@@ -50,7 +54,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 }`
               }
             >
-              <FaUserFriends className="w-6 h-6" />
+              <FaThLarge className="w-6 h-6" />
               {isSidebarOpen && <span className="ml-3">Dashboard</span>}
             </NavLink>
           </li>
@@ -63,7 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 }`
               }
             >
-              <FaUserFriends className="w-6 h-6" />
+              <FaUserTie className="w-6 h-6" />
               {isSidebarOpen && <span className="ml-3">Candidates</span>}
             </NavLink>
           </li>
@@ -79,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   }`
                 }
               >
-                <FaUserLock className="w-6 h-6" />
+                <FaUsersCog className="w-6 h-6" />
                 {isSidebarOpen && <span className="ml-3">Users</span>}
               </NavLink>
             </li>

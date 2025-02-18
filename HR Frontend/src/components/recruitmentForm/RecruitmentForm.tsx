@@ -55,7 +55,13 @@ const RecruitmentForm: React.FC = () => {
     joiningDate: "",
     remarks: "",
   });
-
+  const mandatoryFields = [
+    "tlName",
+    "taName",
+    "candidateName",
+    "phoneNumber",
+    "email",
+  ]; // Add other mandatory fields as needed
   const [error, setError] = useState<string | null>(null);
 
   // Fetch dropdown options
@@ -63,23 +69,23 @@ const RecruitmentForm: React.FC = () => {
     axios
       .get(`${API_URL}/api/dropdowns`)
       .then((response) => {
-        const options = {};
-        const unmatched = [];
+        const options: DropdownOptions = {};
+        const unmatched: string[] = [];
 
         response.data.forEach((dropdown) => {
-          if (formData.hasOwnProperty(dropdown.name)) {
-            options[dropdown.name] = dropdown.options;
-          } else {
-            unmatched.push(dropdown.name); // Track unmatched fields
-            options[dropdown.name] = dropdown.options; // Ensure options are available for unmatched fields
+          options[dropdown.name] = dropdown.options;
+
+          // Add to unmatchedFields if the field is not in formData
+          if (!formData.hasOwnProperty(dropdown.name)) {
+            unmatched.push(dropdown.name);
           }
         });
 
         setDropdownOptions(options);
-        setUnmatchedFields(unmatched);
+        setUnmatchedFields(unmatched); // Set unmatched fields only once
       })
       .catch((error) => console.error(error));
-  }, [formData]); // Ensure formData changes trigger the effect
+  }, []); // Empty dependency array to run only once
 
   // Fetch candidate data if editing
   useEffect(() => {
@@ -132,22 +138,36 @@ const RecruitmentForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check for mandatory fields
+    const missingFields = mandatoryFields.filter((field) => !formData[field]);
+
+    if (missingFields.length > 0) {
+      setAlert({
+        message: `Please fill out the following mandatory fields: ${missingFields.join(
+          ", "
+        )}`,
+        type: "error",
+      });
+      return; // Stop form submission if mandatory fields are missing
+    }
+
     const url = id
       ? `${API_URL}/api/candidates/${id}`
       : `${API_URL}/api/candidates`;
 
     try {
       if (id) {
-        await axios.put(url, formData,{
-          withCredentials:true
+        await axios.put(url, formData, {
+          withCredentials: true,
         });
         setAlert({
           message: "Candidate updated successfully!",
           type: "success",
         });
       } else {
-        await axios.post(url, formData,{
-          withCredentials:true
+        await axios.post(url, formData, {
+          withCredentials: true,
         });
         setAlert({ message: "Candidate added successfully!", type: "info" });
       }
@@ -343,8 +363,9 @@ const RecruitmentForm: React.FC = () => {
                 className="block text-sm font-medium text-gray-800"
                 htmlFor="candidateName"
               >
-                Candidate Name
+                <span className="text-red-600">* </span> Candidate Name
               </label>
+
               <input
                 type="text"
                 name="candidateName"
@@ -429,7 +450,7 @@ const RecruitmentForm: React.FC = () => {
                 className="block text-sm font-medium text-gray-800"
                 htmlFor="phoneNumber"
               >
-                Phone Number
+                <span className="text-red-600">* </span> Phone Number
               </label>
               <input
                 type="text"
@@ -446,7 +467,7 @@ const RecruitmentForm: React.FC = () => {
                 className="block text-sm font-medium text-gray-800"
                 htmlFor="email"
               >
-                Email Id
+                <span className="text-red-600">* </span> Email
               </label>
               <input
                 type="email"

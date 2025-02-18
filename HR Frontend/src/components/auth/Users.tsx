@@ -88,11 +88,6 @@ const Users: React.FC = () => {
       return;
     }
 
-    if (user?.id === user?.id) {
-      showAlert("Admins cannot delete themselves!", "error");
-      return;
-    }
-
     try {
       await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
         withCredentials: true,
