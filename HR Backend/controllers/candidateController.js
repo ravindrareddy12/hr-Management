@@ -4,41 +4,40 @@ const User = require("../models/User");
 exports.getAllCandidates = async (req, res) => {
   try {
     if (!req.user || !req.user.userId) {
-      return res.status(401).json({ error: "Unauthorized: Missing userId" });
+        return res.status(401).json({ error: "Unauthorized: Missing userId" });
     }
 
     // Fetch the logged-in user
     const loggedInUser = await User.findById(req.user.userId);
     if (!loggedInUser) {
-      return res.status(404).json({ error: "User not found" });
+        return res.status(404).json({ error: "User not found" });
     }
 
     let candidates;
 
     if (loggedInUser.role === "team-leader") {
-      // Find all team members where teamLeader is the logged-in user
-      const teamMembers = await User.find({
-        teamLeader: loggedInUser._id,
-      }).select("_id");
+        // Find all team members where teamLeader is the logged-in user
+        const teamMembers = await User.find({ teamLeader: loggedInUser._id }).select("_id");
+        const memberIds = teamMembers.map(member => member._id); // Extract user IDs
 
-      const memberIds = teamMembers.map((member) => member._id); // Extract user IDs
+        // Fetch candidates where userId is either the team leader or any of their team members
+        candidates = await Candidate.find({ userId: { $in: [loggedInUser._id, ...memberIds] } });
 
-      // Fetch candidates where userId is either the team leader or any of their team members
-      candidates = await Candidate.find({
-        userId: { $in: [loggedInUser._id, ...memberIds] },
-      });
+    } else if (loggedInUser.role === "admin") {
+        // Fetch all candidates irrespective of users
+        candidates = await Candidate.find({});
     } else {
-      // If not a team leader, fetch only their own candidates
-      candidates = await Candidate.find({ userId: loggedInUser._id });
+        // If not a team leader or admin, fetch only their own candidates
+        candidates = await Candidate.find({ userId: loggedInUser._id });
     }
 
     res.status(200).json({ success: true, data: candidates });
-  } catch (error) {
+
+} catch (error) {
     console.error("Error fetching candidates:", error);
-    res
-      .status(500)
-      .json({ error: "Failed to fetch candidates", details: error.message });
-  }
+    res.status(500).json({ error: "Failed to fetch candidates", details: error.message });
+}
+
 };
 // Get a candidate by ID
 exports.getCandidateById = async (req, res) => {
@@ -104,46 +103,46 @@ exports.deleteCandidate = async (req, res) => {
 exports.getRecentCandidates = async (req, res) => {
   try {
     if (!req.user || !req.user.userId) {
-      return res.status(401).json({ error: "Unauthorized: Missing userId" });
+        return res.status(401).json({ error: "Unauthorized: Missing userId" });
     }
 
     // Fetch the logged-in user
     const loggedInUser = await User.findById(req.user.userId);
     if (!loggedInUser) {
-      return res.status(404).json({ error: "User not found" });
+        return res.status(404).json({ error: "User not found" });
     }
 
     let candidates;
 
-    if (loggedInUser.role === "team-leader") {
-      // Find all team members where teamLeader is the logged-in user
-      const teamMembers = await User.find({
-        teamLeader: loggedInUser._id,
-      }).select("_id");
+    if (loggedInUser.role === "admin") {
+        // Admin fetches the 5 most recent candidates for all users
+        candidates = await Candidate.find({})
+            .sort({ createdAt: -1 })
+            .limit(5);
+    } else if (loggedInUser.role === "team-leader") {
+        // Find all team members where teamLeader is the logged-in user
+        const teamMembers = await User.find({ teamLeader: loggedInUser._id }).select("_id");
+        const memberIds = teamMembers.map(member => member._id);
 
-      const memberIds = teamMembers.map((member) => member._id);
-
-      // Fetch the 5 most recent candidates where userId is either the team leader or any of their team members
-      candidates = await Candidate.find({
-        userId: { $in: [loggedInUser._id, ...memberIds] },
-      })
-        .sort({ createdAt: -1 })
-        .limit(5);
+        // Fetch the 5 most recent candidates for the team leader and their team members
+        candidates = await Candidate.find({ userId: { $in: [loggedInUser._id, ...memberIds] } })
+            .sort({ createdAt: -1 })
+            .limit(5);
     } else {
-      // If not a team leader, fetch only their 5 most recent candidates
-      candidates = await Candidate.find({ userId: loggedInUser._id })
-        .sort({ createdAt: -1 })
-        .limit(5);
+        // Normal user fetches only their 5 most recent candidates
+        candidates = await Candidate.find({ userId: loggedInUser._id })
+            .sort({ createdAt: -1 })
+            .limit(5);
     }
 
     res.status(200).json({ success: true, data: candidates });
-  } catch (error) {
+
+} catch (error) {
     console.error("Error fetching recent candidates:", error);
-    res
-      .status(500)
-      .json({
+    res.status(500).json({
         error: "Failed to fetch recent candidates",
         details: error.message,
-      });
-  }
+    });
+}
+
 };
