@@ -17,12 +17,16 @@ exports.getAllCandidates = async (req, res) => {
 
     if (loggedInUser.role === "team-leader") {
       // Find all team members where teamLeader is the logged-in user
-      const teamMembers = await User.find({ teamLeader: loggedInUser._id }).select("_id");
+      const teamMembers = await User.find({
+        teamLeader: loggedInUser._id,
+      }).select("_id");
 
-      const memberIds = teamMembers.map(member => member._id); // Extract user IDs
+      const memberIds = teamMembers.map((member) => member._id); // Extract user IDs
 
       // Fetch candidates where userId is either the team leader or any of their team members
-      candidates = await Candidate.find({ userId: { $in: [loggedInUser._id, ...memberIds] } });
+      candidates = await Candidate.find({
+        userId: { $in: [loggedInUser._id, ...memberIds] },
+      });
     } else {
       // If not a team leader, fetch only their own candidates
       candidates = await Candidate.find({ userId: loggedInUser._id });
@@ -31,14 +35,17 @@ exports.getAllCandidates = async (req, res) => {
     res.status(200).json({ success: true, data: candidates });
   } catch (error) {
     console.error("Error fetching candidates:", error);
-    res.status(500).json({ error: "Failed to fetch candidates", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch candidates", details: error.message });
   }
 };
 // Get a candidate by ID
 exports.getCandidateById = async (req, res) => {
   try {
     const candidate = await Candidate.findById(req.params.id);
-    if (!candidate) return res.status(404).json({ error: "Candidate not found" });
+    if (!candidate)
+      return res.status(404).json({ error: "Candidate not found" });
     res.json(candidate);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch candidate" });
@@ -60,10 +67,11 @@ exports.createCandidate = async (req, res) => {
     res.status(201).json(savedCandidate);
   } catch (error) {
     console.error("Error creating candidate:", error); // Logs error for debugging
-    res.status(500).json({ error: "Failed to create candidate", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Failed to create candidate", details: error.message });
   }
 };
-
 
 // Update a candidate
 exports.updateCandidate = async (req, res) => {
@@ -73,7 +81,8 @@ exports.updateCandidate = async (req, res) => {
       req.body,
       { new: true }
     );
-    if (!updatedCandidate) return res.status(404).json({ error: "Candidate not found" });
+    if (!updatedCandidate)
+      return res.status(404).json({ error: "Candidate not found" });
     res.json(updatedCandidate);
   } catch (error) {
     res.status(400).json({ error: "Failed to update candidate" });
@@ -84,7 +93,8 @@ exports.updateCandidate = async (req, res) => {
 exports.deleteCandidate = async (req, res) => {
   try {
     const deletedCandidate = await Candidate.findByIdAndDelete(req.params.id);
-    if (!deletedCandidate) return res.status(404).json({ error: "Candidate not found" });
+    if (!deletedCandidate)
+      return res.status(404).json({ error: "Candidate not found" });
     res.json({ message: "Candidate deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete candidate" });
@@ -92,16 +102,48 @@ exports.deleteCandidate = async (req, res) => {
 };
 // Get recent candidates
 exports.getRecentCandidates = async (req, res) => {
-    try {
-        console.log("called")
-      const limit = 5// Get the limit from query parameters, default to 5
-      const recentCandidates = await Candidate.find()
-        .sort({ createdAt: -1 }) // Sort by creation date in descending order
-        .limit(limit); // Limit the number of results
-      res.json(recentCandidates);
-    } catch (error) {
-        console.log(error)
-      res.status(500).json({ error: error });
+  try {
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ error: "Unauthorized: Missing userId" });
     }
-  };
-  
+
+    // Fetch the logged-in user
+    const loggedInUser = await User.findById(req.user.userId);
+    if (!loggedInUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    let candidates;
+
+    if (loggedInUser.role === "team-leader") {
+      // Find all team members where teamLeader is the logged-in user
+      const teamMembers = await User.find({
+        teamLeader: loggedInUser._id,
+      }).select("_id");
+
+      const memberIds = teamMembers.map((member) => member._id);
+
+      // Fetch the 5 most recent candidates where userId is either the team leader or any of their team members
+      candidates = await Candidate.find({
+        userId: { $in: [loggedInUser._id, ...memberIds] },
+      })
+        .sort({ createdAt: -1 })
+        .limit(5);
+    } else {
+      // If not a team leader, fetch only their 5 most recent candidates
+      candidates = await Candidate.find({ userId: loggedInUser._id })
+        .sort({ createdAt: -1 })
+        .limit(5);
+    }
+
+    res.status(200).json({ success: true, data: candidates });
+  } catch (error) {
+    console.error("Error fetching recent candidates:", error);
+    res
+      .status(500)
+      .json({
+        error: "Failed to fetch recent candidates",
+        details: error.message,
+      });
+  }
+};

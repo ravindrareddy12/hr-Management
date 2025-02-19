@@ -10,7 +10,7 @@ router.get("/:id", candidateController.getCandidateById);
 router.post("/",authenticate, candidateController.createCandidate);
 router.put("/:id", candidateController.updateCandidate);
 router.delete("/:id", candidateController.deleteCandidate);
-router.get("/recent/limit", candidateController.getRecentCandidates);
+router.get("/recent/limit",authenticate, candidateController.getRecentCandidates);
 router.get("/statistics/st",authenticate, async (req, res) => {
   try {
     if (!req.user || !req.user.userId) {

@@ -40,9 +40,11 @@ const Dashboard: React.FC = () => {
   const fetchCandidates = async () => {
     try {
       const response = await axios.get<Candidate[]>(
-        `${API_URL}/api/candidates/recent/limit`
+        `${API_URL}/api/candidates/recent/limit`,{
+          withCredentials:true
+        }
       );
-      setRecentCandidates(response.data);
+      setRecentCandidates(response.data.data);
     } catch (err) {
       setErrorCandidates("Failed to fetch candidates");
     } finally {
