@@ -5,6 +5,8 @@ import Charts from "./Charts";
 import RecentCandidates from "./RecentCandidates";
 import axios from "axios";
 import { fetchCandidateStatistics } from "./service";
+import { FaSpinner } from "react-icons/fa"; // Import spinner
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Define types
@@ -22,9 +24,13 @@ interface Statistic {
 
 const Dashboard: React.FC = () => {
   const [recentCandidates, setRecentCandidates] = useState<Candidate[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<Statistic[]>([]);
+
+  const [loadingStats, setLoadingStats] = useState<boolean>(true);
+  const [loadingCandidates, setLoadingCandidates] = useState<boolean>(true);
+
+  const [errorStats, setErrorStats] = useState<string | null>(null);
+  const [errorCandidates, setErrorCandidates] = useState<string | null>(null);
 
   // Fetch recent candidates
   useEffect(() => {
@@ -34,13 +40,13 @@ const Dashboard: React.FC = () => {
   const fetchCandidates = async () => {
     try {
       const response = await axios.get<Candidate[]>(
-        API_URL + "/api/candidates/recent/limit"
+        `${API_URL}/api/candidates/recent/limit`
       );
       setRecentCandidates(response.data);
     } catch (err) {
-      setError("Failed to fetch candidates");
+      setErrorCandidates("Failed to fetch candidates");
     } finally {
-      setLoading(false);
+      setLoadingCandidates(false);
     }
   };
 
@@ -51,7 +57,9 @@ const Dashboard: React.FC = () => {
         const statistics = await fetchCandidateStatistics();
         setStats(statistics);
       } catch (error) {
-        setError("Failed to fetch candidate statistics");
+        setErrorStats("Failed to fetch candidate statistics");
+      } finally {
+        setLoadingStats(false);
       }
     };
 
@@ -61,23 +69,46 @@ const Dashboard: React.FC = () => {
   return (
     <PageContainer title="Dashboard">
       <div className="p-6 space-y-9 bg-gray-100">
-        {/* Pass mapped statistics data to Statistics component */}
-        <Statistics
-          stats={{
-            totalCandidates:
-              stats.find((s) => s.name === "Total Candidates")?.value || 0,
-            offersMade: stats.find((s) => s.name === "Offers Made")?.value || 0,
-            candidatesJoined:
-              stats.find((s) => s.name === "Candidates Joined")?.value || 0,
-          }}
-        />
-        <Charts />
-        <RecentCandidates
-          fetchCandidates={fetchCandidates}
-          candidates={recentCandidates}
-          loading={loading}
-          error={error}
-        />
+        {/* Statistics Section */}
+        {loadingStats ? (
+          <div className="flex items-center justify-center h-32 bg-white shadow-md rounded-lg">
+            <FaSpinner className="animate-spin text-blue-800 text-3xl" />
+          </div>
+        ) : errorStats ? (
+          <p className="text-red-500">{errorStats}</p>
+        ) : (
+          <Statistics
+            stats={{
+              totalCandidates:
+                stats.find((s) => s.name === "Total Candidates")?.value || 0,
+              offersMade:
+                stats.find((s) => s.name === "Offers Made")?.value || 0,
+              candidatesJoined:
+                stats.find((s) => s.name === "Candidates Joined")?.value || 0,
+            }}
+          />
+        )}
+
+        {/* Charts Section */}
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <Charts />
+        </div>
+
+        {/* Recent Candidates Section */}
+        {loadingCandidates ? (
+          <div className="flex items-center justify-center h-32 bg-white shadow-md rounded-lg">
+            <FaSpinner className="animate-spin text-blue-800 text-3xl" />
+          </div>
+        ) : errorCandidates ? (
+          <p className="text-red-500">{errorCandidates}</p>
+        ) : (
+          <RecentCandidates
+            fetchCandidates={fetchCandidates}
+            candidates={recentCandidates}
+            loading={loadingCandidates}
+            error={errorCandidates}
+          />
+        )}
       </div>
     </PageContainer>
   );

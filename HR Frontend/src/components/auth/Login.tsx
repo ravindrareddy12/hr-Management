@@ -2,18 +2,22 @@ import React, { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext";
-import AlertMessages from "../AlertMessage"; // Import the alert component
+import AlertMessages from "../AlertMessage";
+import { FaSpinner } from "react-icons/fa"; // Spinner for loading state
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [showAlert, setShowAlert] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true); // Start loading state
+
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/login`,
@@ -34,12 +38,15 @@ const Login = () => {
           })
         );
 
-        navigate("/dashboard"); // 🚀 Navigate immediately
+        navigate("/dashboard"); // 🚀 Navigate to Dashboard
       }
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || "An error occurred";
+      const errorMsg =
+        err.response?.data?.message || "Login failed. Please try again.";
       setError(errorMsg);
-      setShowAlert(true); // Show alert when there's an error
+      setShowAlert(true); // Show alert
+    } finally {
+      setLoading(false); // Stop loading state
     }
   };
 
@@ -80,8 +87,21 @@ const Login = () => {
               required
             />
           </div>
-          <button className="w-full px-4 py-2 mt-6 text-white bg-gray-800 rounded-lg hover:bg-blue-800">
-            Login
+          <button
+            className={`w-full px-4 py-2 mt-6 text-white rounded-lg flex items-center justify-center ${
+              loading
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-gray-800 hover:bg-blue-800"
+            }`}
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <FaSpinner className="animate-spin mr-2" /> Logging in...
+              </>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
         <p className="mt-4 text-sm text-center text-gray-600">

@@ -3,6 +3,7 @@ import axios from "axios";
 import PageContainer from "../layout/PageContainer";
 import AlertMessages from "../AlertMessage";
 import { useAuth } from "../../contexts/AuthContext";
+import { FaSpinner } from "react-icons/fa"; // Import spinner icon
 
 const Users: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -12,9 +13,10 @@ const Users: React.FC = () => {
     role: "team-member",
     teamLeader: "",
   });
-  const { user } = useAuth();
 
+  const { user } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false); // Loading state added
   const [error, setError] = useState<string | null>(null);
   const [alert, setAlert] = useState({
     message: "",
@@ -34,6 +36,7 @@ const Users: React.FC = () => {
   }, []);
 
   const fetchUsers = async () => {
+    setLoading(true); // Show loading before fetching users
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users`, {
         withCredentials: true,
@@ -41,6 +44,8 @@ const Users: React.FC = () => {
       setUsers(res.data);
     } catch (err) {
       showAlert("Error fetching users", "error");
+    } finally {
+      setLoading(false); // Hide loading after fetching users
     }
   };
 
@@ -62,6 +67,8 @@ const Users: React.FC = () => {
       setError("Please fill in all fields.");
       return;
     }
+
+    setLoading(true); // Show loading during user creation
     try {
       await axios.post(
         `${import.meta.env.VITE_API_URL}/api/users/create`,
@@ -79,6 +86,8 @@ const Users: React.FC = () => {
       fetchUsers();
     } catch (err) {
       showAlert("Failed to create user", "error");
+    } finally {
+      setLoading(false); // Hide loading after user creation
     }
   };
 
@@ -88,6 +97,7 @@ const Users: React.FC = () => {
       return;
     }
 
+    setLoading(true); // Show loading during deletion
     try {
       await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
         withCredentials: true,
@@ -96,6 +106,8 @@ const Users: React.FC = () => {
       fetchUsers();
     } catch (err) {
       showAlert("Error deleting user", "error");
+    } finally {
+      setLoading(false); // Hide loading after deletion
     }
   };
 
@@ -176,8 +188,13 @@ const Users: React.FC = () => {
             <button
               type="submit"
               className="w-full px-4 py-2 text-white bg-gray-800 rounded-lg hover:bg-blue-800"
+              disabled={loading}
             >
-              Create {formData.role}
+              {loading ? (
+                <FaSpinner className="animate-spin inline-block mr-2" />
+              ) : (
+                `Create ${formData.role}`
+              )}
             </button>
           </form>
         </div>
@@ -185,33 +202,39 @@ const Users: React.FC = () => {
           <h3 className="text-xl font-semibold text-gray-800 mb-4">
             Users List
           </h3>
-          <div className="max-h-[400px] overflow-y-auto border border-gray-300 rounded-lg shadow-md">
-            <table className="min-w-full text-sm text-left table-fixed">
-              <thead className="bg-gray-200 sticky top-0 shadow-md">
-                <tr>
-                  <th className="px-4 py-3 border-b w-1/3">Username</th>
-                  <th className="px-4 py-3 border-b w-1/3">Role</th>
-                  <th className="px-4 py-3 border-b w-1/3">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-300">
-                {users.map((user) => (
-                  <tr key={user._id} className="hover:bg-gray-100">
-                    <td className="px-4 py-3 truncate">{user.username}</td>
-                    <td className="px-4 py-3 truncate">{user.role}</td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => handleDelete(user._id, user.role)}
-                        className="text-red-600  px-3 py-1 rounded  hover:text-blue-800"
-                      >
-                        Delete
-                      </button>
-                    </td>
+          {loading ? (
+            <div className="flex justify-center py-4">
+              <FaSpinner className="animate-spin text-blue-800 text-4xl" />
+            </div>
+          ) : (
+            <div className="max-h-[400px] overflow-y-auto border border-gray-300 rounded-lg shadow-md">
+              <table className="min-w-full text-sm text-left table-fixed">
+                <thead className="bg-gray-200 sticky top-0 shadow-md">
+                  <tr>
+                    <th className="px-4 py-3 border-b w-1/3">Username</th>
+                    <th className="px-4 py-3 border-b w-1/3">Role</th>
+                    <th className="px-4 py-3 border-b w-1/3">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-300">
+                  {users.map((user) => (
+                    <tr key={user._id} className="hover:bg-gray-100">
+                      <td className="px-4 py-3 truncate">{user.username}</td>
+                      <td className="px-4 py-3 truncate">{user.role}</td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => handleDelete(user._id, user.role)}
+                          className="text-red-600 px-3 py-1 rounded hover:text-blue-800"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </PageContainer>

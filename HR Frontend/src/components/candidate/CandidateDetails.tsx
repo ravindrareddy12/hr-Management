@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import PageContainer from "../layout/PageContainer";
 import AlertMessage from "../AlertMessage";
 const API_URL = import.meta.env.VITE_API_URL;
+import { FaSpinner } from "react-icons/fa";
 
 interface Candidate {
   candidateName: string;
@@ -68,7 +69,9 @@ const CandidateDetails: React.FC = () => {
         title="Candidate Details"
         description="Loading candidate information..."
       >
-        <p>Loading candidate details...</p>
+        <div className="flex items-center justify-center h-screen">
+          <FaSpinner className="animate-spin text-blue-800 text-4xl" />
+        </div>
       </PageContainer>
     );
   }

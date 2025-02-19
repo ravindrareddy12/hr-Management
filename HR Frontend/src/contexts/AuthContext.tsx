@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { FaSpinner } from "react-icons/fa";
 
 interface User {
   _id: string;
@@ -9,7 +10,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>; // ✅ Add setUser
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
   fetchUser: () => void;
   login: (credentials: { email: string; password: string }) => Promise<void>;
@@ -45,8 +46,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         credentials,
         { withCredentials: true }
       );
-      await fetchUser(); // ✅ Auto-refresh after login
-      window.location.reload(); // ✅ Force a full refresh to apply changes
+      await fetchUser();
+      window.location.reload();
     } catch (error) {
       console.error("Login failed", error);
     }
@@ -60,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         { withCredentials: true }
       );
       setUser(null);
-      window.location.reload(); // ✅ Auto-refresh after logout
+      window.location.reload();
     } catch (error) {
       console.error("Logout failed", error);
     }
@@ -69,6 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     fetchUser();
   }, []);
+
   useEffect(() => {
     const handleStorageChange = () => {
       setUser(JSON.parse(localStorage.getItem("user") || "null"));
@@ -77,6 +79,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <FaSpinner className="animate-spin text-blue-800 text-4xl" />
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider

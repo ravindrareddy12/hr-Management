@@ -61,6 +61,7 @@ const RecruitmentForm: React.FC = () => {
     "candidateName",
     "phoneNumber",
     "email",
+    "client",
   ]; // Add other mandatory fields as needed
   const [error, setError] = useState<string | null>(null);
 
@@ -285,7 +286,7 @@ const RecruitmentForm: React.FC = () => {
                 className="block text-sm font-medium text-gray-800"
                 htmlFor="client"
               >
-                Client
+                <span className="text-red-600">* </span> Client
               </label>
               <select
                 name="client"

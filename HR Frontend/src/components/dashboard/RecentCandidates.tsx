@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import AlertMessages from "../AlertMessage";
+import { FaSpinner } from "react-icons/fa";
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface Candidate {
@@ -74,7 +75,9 @@ const RecentCandidates: React.FC<RecentCandidatesProps> = ({
       )}
       <h3 className="text-xl font-bold mb-4">Recent Candidates</h3>
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex items-center justify-center">
+          <FaSpinner className="animate-spin text-blue-800 text-2xl" />
+        </div>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (

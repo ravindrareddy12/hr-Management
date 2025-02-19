@@ -11,6 +11,7 @@ import Layout from "./layout/layout";
 import { useAuth } from "../contexts/AuthContext";
 import { FaLock } from "react-icons/fa";
 import NotFound from "./NotFound";
+import { FaSpinner } from "react-icons/fa";
 
 const AccessDenied: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -33,7 +34,13 @@ const ProtectedRoute: React.FC<{ element: React.ReactNode }> = ({
 }) => {
   const { user, loading } = useAuth();
 
-  if (loading) return <p>Loading...</p>; // Show loading while checking auth
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <FaSpinner className="animate-spin text-blue-800 text-4xl" />
+      </div>
+    );
+
   return user ? <>{element}</> : <Navigate to="/login" replace />;
 };
 
