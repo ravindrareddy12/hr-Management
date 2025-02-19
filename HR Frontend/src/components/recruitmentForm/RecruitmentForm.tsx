@@ -153,6 +153,50 @@ const RecruitmentForm: React.FC = () => {
       return; // Stop form submission if mandatory fields are missing
     }
 
+    // Cooling period check based on phone number or email
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/candidates/submission-history`,
+        {
+          params: {
+            phoneNumber: formData.phoneNumber, // Use phone number or email
+            email: formData.email,
+            client: formData.client,
+          },
+          withCredentials: true,
+        }
+      );
+
+      const submissions = response.data;
+
+      // Check if there is any submission within the last 30 days
+      const coolingPeriodActive = submissions.some((submission: any) => {
+        const submissionDate = new Date(submission.dateOfSubmission);
+        const currentDate = new Date();
+        const timeDifference = currentDate.getTime() - submissionDate.getTime();
+        const daysDifference = timeDifference / (1000 * 3600 * 24);
+
+        return daysDifference < 30;
+      });
+
+      if (coolingPeriodActive) {
+        setAlert({
+          message:
+            "Candidate cannot be submitted to the same client within 30 days of the last submission.",
+          type: "error",
+        });
+        return; // Stop form submission if cooling period is active
+      }
+    } catch (err) {
+      console.error("Error fetching submission history:", err);
+      setAlert({
+        message: "Failed to check cooling period. Please try again.",
+        type: "error",
+      });
+      return; // Stop form submission if there's an error
+    }
+
+    // Proceed with submission if cooling period is not active
     const url = id
       ? `${API_URL}/api/candidates/${id}`
       : `${API_URL}/api/candidates`;
@@ -177,16 +221,15 @@ const RecruitmentForm: React.FC = () => {
       setTimeout(() => {
         setAlert(null);
         navigate("/candidates");
-      }, 1000); // Wait 5 seconds before navigating
+      }, 5000); // Wait 5 seconds before navigating
     } catch (err) {
       console.error("Error saving candidate data:", err);
       setAlert({ message: "Failed to save candidate data.", type: "error" });
 
       // Hide error message after 5 seconds
-      setTimeout(() => setAlert(null), 1000);
+      setTimeout(() => setAlert(null), 5000);
     }
   };
-
   const handleNavigateToDropdownManager = () => {
     navigate("/dropdownManager"); // Navigate to the DropdownManager page
   };

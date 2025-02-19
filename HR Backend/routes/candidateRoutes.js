@@ -83,5 +83,20 @@ router.get("/statistics/st",authenticate, async (req, res) => {
 
 });
 
+
+router.get("/api/candidates/submission-history", async (req, res) => {
+    const { phoneNumber, email, client } = req.query;
   
+    try {
+      const submissions = await Candidate.find({
+        $or: [{ phoneNumber }, { email }], // Match either phone number or email
+        client,
+      }).select("dateOfSubmission");
+  
+      res.json(submissions);
+    } catch (error) {
+      console.error("Error fetching submission history:", error);
+      res.status(500).json({ message: "Failed to fetch submission history" });
+    }
+  });
 module.exports = router;

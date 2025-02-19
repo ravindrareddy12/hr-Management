@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AlertMessages from "../AlertMessage";
 import { useAuth } from "../../contexts/AuthContext";
-import logo from "../../assets/logo.jpg";
+import logo from "../../assets/logo.png";
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState<string | null>(null);
