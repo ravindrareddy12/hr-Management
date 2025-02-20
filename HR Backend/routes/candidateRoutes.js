@@ -83,21 +83,26 @@ router.get("/statistics/st",authenticate, async (req, res) => {
 
 });
 
-
 router.get("/colingPeriodCheck/cool", async (req, res) => {
     console.log("Submission history route hit");
     const { phoneNumber, email, client } = req.query;
+    console.log("Query Parameters:", { phoneNumber, email, client });
   
     try {
       const submissions = await Candidate.find({
-        $or: [{ phoneNumber }, { email }], // Match either phone number or email
-        client,
+        $or: [
+          { phoneNumber: { $regex: new RegExp(`^${phoneNumber}$`, "i") } },
+          { email: { $regex: new RegExp(`^${email}$`, "i") } }
+        ],
+        client: { $regex: new RegExp(`^${client}$`, "i") }
       }).select("dateOfSubmission");
   
+      console.log("Submissions:", submissions);
       res.json(submissions);
     } catch (error) {
       console.error("Error fetching submission history:", error);
       res.status(500).json({ message: "Failed to fetch submission history" });
     }
   });
+
 module.exports = router;

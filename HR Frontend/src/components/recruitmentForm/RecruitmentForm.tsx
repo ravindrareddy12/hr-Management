@@ -62,6 +62,7 @@ const RecruitmentForm: React.FC = () => {
     "phoneNumber",
     "email",
     "client",
+    "dateOfSubmission",
   ]; // Add other mandatory fields as needed
   const [error, setError] = useState<string | null>(null);
 
@@ -158,13 +159,16 @@ const RecruitmentForm: React.FC = () => {
       const response = await axios.get(
         `${API_URL}/api/candidates/colingPeriodCheck/cool`,
         {
+          params: {
             phoneNumber: formData.phoneNumber, // Use phone number or email
             email: formData.email,
             client: formData.client,
-          }
+          },
+        }
       );
 
       const submissions = response.data;
+      console.log("Submissions from backend:", submissions);
 
       // Check if there is any submission within the last 30 days
       const coolingPeriodActive = submissions.some((submission: any) => {
@@ -172,6 +176,10 @@ const RecruitmentForm: React.FC = () => {
         const currentDate = new Date();
         const timeDifference = currentDate.getTime() - submissionDate.getTime();
         const daysDifference = timeDifference / (1000 * 3600 * 24);
+
+        console.log("Submission Date:", submissionDate);
+        console.log("Current Date:", currentDate);
+        console.log("Days Difference:", daysDifference);
 
         return daysDifference < 30;
       });
@@ -384,7 +392,7 @@ const RecruitmentForm: React.FC = () => {
                 className="block text-sm font-medium text-gray-800"
                 htmlFor="dateOfSubmission"
               >
-                Date of Submission
+                <span className="text-red-600">* </span>Date of Submission
               </label>
               <input
                 type="date"

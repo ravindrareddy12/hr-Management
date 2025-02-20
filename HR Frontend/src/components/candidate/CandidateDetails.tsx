@@ -107,11 +107,23 @@ const CandidateDetails: React.FC = () => {
               </p>
               <p>
                 <strong>Created At:</strong>{" "}
-                {new Date(candidate.createdAt).toLocaleDateString("en-GB")}
+                {candidate.createdAt
+                  ? new Date(candidate.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : ""}
               </p>
               <p>
                 <strong>Updated At:</strong>{" "}
-                {new Date(candidate.updatedAt).toLocaleDateString("en-GB")}
+                {candidate.updatedAt
+                  ? new Date(candidate.updatedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : ""}
               </p>
             </div>
 
@@ -134,7 +146,12 @@ const CandidateDetails: React.FC = () => {
                 {candidate.dateOfRequirement &&
                 new Date(candidate.dateOfRequirement).getTime() !== 0
                   ? new Date(candidate.dateOfRequirement).toLocaleDateString(
-                      "en-GB"
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }
                     )
                   : ""}
               </p>
@@ -143,7 +160,12 @@ const CandidateDetails: React.FC = () => {
                 {candidate.dateOfSubmission &&
                 new Date(candidate.dateOfSubmission).getTime() !== 0
                   ? new Date(candidate.dateOfSubmission).toLocaleDateString(
-                      "en-GB"
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }
                     )
                   : ""}
               </p>
@@ -193,14 +215,31 @@ const CandidateDetails: React.FC = () => {
 
               <p>
                 <strong>Selection Date:</strong>{" "}
-                {new Date(candidate.selectionDate).toLocaleDateString("en-GB")}
+                {candidate.selectionDate &&
+                new Date(candidate.selectionDate).getTime() !== 0
+                  ? new Date(candidate.selectionDate).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }
+                    )
+                  : ""}
               </p>
               <p>
                 <strong>Salary Offered:</strong> {candidate.salaryOffered}
               </p>
               <p>
                 <strong>Offer Date:</strong>{" "}
-                {new Date(candidate.offerDate).toLocaleDateString("en-GB")}
+                {candidate.offerDate &&
+                new Date(candidate.offerDate).getTime() !== 0
+                  ? new Date(candidate.offerDate).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : ""}
               </p>
               <p>
                 <strong>Offer Status:</strong> {candidate.offerStatus}
@@ -210,7 +249,17 @@ const CandidateDetails: React.FC = () => {
               </p>
               <p>
                 <strong>Joining Date:</strong>
-                {new Date(candidate.joiningDate).toLocaleDateString("en-GB")}
+                {candidate.joiningDate &&
+                new Date(candidate.joiningDate).getTime() !== 0
+                  ? new Date(candidate.joiningDate).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }
+                    )
+                  : ""}{" "}
               </p>
             </div>
             <div>
@@ -220,9 +269,16 @@ const CandidateDetails: React.FC = () => {
 
               <p>
                 <strong>Internal Interview Date:</strong>
-                {new Date(candidate.internalInterviewDate).toLocaleDateString(
-                  "en-GB"
-                )}
+                {candidate.internalInterviewDate &&
+                new Date(candidate.internalInterviewDate).getTime() !== 0
+                  ? new Date(
+                      candidate.internalInterviewDate
+                    ).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : ""}
               </p>
               <p>
                 <strong>Internal Interview Status:</strong>
@@ -236,9 +292,17 @@ const CandidateDetails: React.FC = () => {
 
               <p>
                 <strong>Client Interview Date:</strong>
-                {new Date(candidate.clientInterviewDate).toLocaleDateString(
-                  "en-GB"
-                )}
+                {candidate.clientInterviewDate &&
+                new Date(candidate.clientInterviewDate).getTime() !== 0
+                  ? new Date(candidate.clientInterviewDate).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }
+                    )
+                  : ""}
               </p>
               <p>
                 <strong>Client Interview:</strong>
