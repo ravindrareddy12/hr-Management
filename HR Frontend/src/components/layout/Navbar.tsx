@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaSignOutAlt } from "react-icons/fa";
+import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AlertMessages from "../AlertMessage";
@@ -13,7 +13,9 @@ const Navbar: React.FC = () => {
     type: "success" as "success" | "error" | "info" | "warning" | "dark",
     show: false,
   });
+  const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
   const { user } = useAuth();
+
   useEffect(() => {
     setUserName(localStorage.getItem("userName"));
   }, []);
@@ -47,6 +49,9 @@ const Navbar: React.FC = () => {
       });
   };
 
+  const handleProfileClick = () => {
+    navigate("/profile"); // Navigate to the profile page
+  };
   return (
     <>
       {alert.show && (
@@ -57,8 +62,12 @@ const Navbar: React.FC = () => {
         />
       )}
       <div className="fixed top-0 left-0 w-full bg-gray-100 shadow-lg p-4 z-10 flex justify-between items-center">
-        <div className="flex items-center">
-          <img src={logo} alt="Logo" className="h-10 w-auto" />
+        <div className="flex items-center bg-gray-100 p-2 rounded-lg">
+          <img
+            src={logo}
+            alt="Logo"
+            className="h-10 w-auto max-w-[150px] object-contain"
+          />
         </div>
 
         <div className="text-center flex-1">
@@ -66,17 +75,27 @@ const Navbar: React.FC = () => {
             Hi, {user?.username}
           </h2>
         </div>
-        <div className="flex items-center space-x-4">
-          <FaSignOutAlt
+        <div className="flex items-center space-x-4 relative">
+          <FaUserCircle
             className="w-8 h-8 text-gray-800 hover:text-blue-800 cursor-pointer"
-            onClick={handleLogout}
+            onClick={() => setShowPopup(!showPopup)} // Toggle popup visibility
           />
-          <button
-            onClick={handleLogout}
-            className="text-gray-800 hover:text-blue-800 focus:outline-none"
-          >
-            Logout
-          </button>
+          {showPopup && (
+            <div className="absolute top-12 right-0 bg-white shadow-lg rounded-lg p-2 w-40">
+              <button
+                onClick={handleProfileClick}
+                className="w-full text-left p-2 hover:bg-gray-100 rounded-lg"
+              >
+                Profile
+              </button>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left p-2 hover:bg-gray-100 rounded-lg"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </>

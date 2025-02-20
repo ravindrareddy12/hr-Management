@@ -4,6 +4,7 @@ import { fileURLToPath, URL } from 'node:url';
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: "/", // Adjust if needed
   plugins: [react()],
   resolve: {
     alias: [
@@ -19,6 +20,5 @@ export default defineConfig({
     host: '127.0.0.1',
     port: 3000,
   },
-  // Add the assetsInclude property
-  assetsInclude: ['**/*.xlsx'],
+  assetsInclude: ['**/*.xlsx'], // Ensure Excel files are included as assets
 });

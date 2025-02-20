@@ -12,6 +12,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { FaLock } from "react-icons/fa";
 import NotFound from "./NotFound";
 import { FaSpinner } from "react-icons/fa";
+import ProfilePage from "./layout/ProfilePage";
 
 const AccessDenied: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -61,6 +62,8 @@ const RoutesComponent: React.FC = () => {
               <Layout>
                 <Routes>
                   <Route path="/" element={<Navigate to="/dashboard" />} />
+                  <Route path="/profile" element={<ProfilePage />} />{" "}
+                  {/* Add the Profile route */}
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/candidates" element={<Candidates />} />
                   <Route
@@ -75,14 +78,12 @@ const RoutesComponent: React.FC = () => {
                     path="/dropdownManager"
                     element={<DropdownManager />}
                   />
-
                   {/* Restrict /users route for team members */}
                   {user?.role === "team-member" ? (
                     <Route path="/users" element={<AccessDenied />} />
                   ) : (
                     <Route path="/users" element={<Users />} />
                   )}
-
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Layout>
