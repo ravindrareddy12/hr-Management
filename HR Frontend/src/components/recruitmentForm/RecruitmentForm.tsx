@@ -156,15 +156,12 @@ const RecruitmentForm: React.FC = () => {
     // Cooling period check based on phone number or email
     try {
       const response = await axios.get(
-        `${API_URL}/api/candidates/submission-history`,
+        `${API_URL}/api/candidates/colingPeriodCheck/cool`,
         {
-          params: {
             phoneNumber: formData.phoneNumber, // Use phone number or email
             email: formData.email,
             client: formData.client,
-          },
-          withCredentials: true,
-        }
+          }
       );
 
       const submissions = response.data;

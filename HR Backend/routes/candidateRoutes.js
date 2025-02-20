@@ -84,7 +84,8 @@ router.get("/statistics/st",authenticate, async (req, res) => {
 });
 
 
-router.get("/api/candidates/submission-history", async (req, res) => {
+router.get("/colingPeriodCheck/cool", async (req, res) => {
+    console.log("Submission history route hit");
     const { phoneNumber, email, client } = req.query;
   
     try {
